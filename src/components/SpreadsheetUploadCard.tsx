@@ -19,7 +19,6 @@ interface SpreadsheetUploadCardProps {
   statusMessage?: string;
   statusTone?: StatusTone;
   lastUploadLabel?: string;
-  shouldWarnAboutMissingData?: boolean;
   onFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -36,7 +35,6 @@ export function SpreadsheetUploadCard({
   statusMessage,
   statusTone = "default",
   lastUploadLabel,
-  shouldWarnAboutMissingData = false,
   onFileChange,
 }: SpreadsheetUploadCardProps) {
   const inputId = useId();
@@ -109,11 +107,6 @@ export function SpreadsheetUploadCard({
           {lastUploadLabel ? (
             <p className="text-sm text-muted-foreground">
               Último upload: {lastUploadLabel}
-            </p>
-          ) : null}
-          {shouldWarnAboutMissingData ? (
-            <p className="text-sm text-muted-foreground">
-              Você já fez upload antes, mas os dados ainda não foram carregados.
             </p>
           ) : null}
         </div>

@@ -132,9 +132,6 @@ export default function App() {
     ? formatUploadTimestamp(persistedUploadAt)
     : "";
 
-  const shouldWarnAboutMissingData =
-    rawSpreadsheetData.length === 0 && Boolean(persistedUploadAt);
-
   return (
     <div>
       <Header />
@@ -146,7 +143,6 @@ export default function App() {
             statusMessage={statusMessage}
             statusTone={statusTone}
             lastUploadLabel={lastUploadLabel}
-            shouldWarnAboutMissingData={shouldWarnAboutMissingData}
             onFileChange={handleFileChange}
           />
         </section>

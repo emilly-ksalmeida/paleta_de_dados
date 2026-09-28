@@ -1,8 +1,10 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 
 import { SpreadsheetUploadCard } from "./components/SpreadsheetUploadCard";
+import { StudentDetailCard } from "./components/StudentDetailCard";
 import { Header } from "./components/Header";
 
+import { mockStudent } from "@/lib/mock/mockStudent";
 import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
 import {
   formatUploadTimestamp,
@@ -154,7 +156,7 @@ export default function App() {
           {JSON.stringify(rawSpreadsheetData[0], null, 2)}
         </aside>
         <section aria-labelledby="dados-heading">
-          <h2 id="dados-heading">Dados principais</h2>
+          <StudentDetailCard student={mockStudent} />
         </section>
       </main>
     </div>

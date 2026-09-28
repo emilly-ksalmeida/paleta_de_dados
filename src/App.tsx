@@ -1,21 +1,27 @@
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 
-import { Header } from "./components/Header";
 import { SpreadsheetUploadCard } from "./components/SpreadsheetUploadCard";
+import { Header } from "./components/Header";
+
 import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
 import {
   formatUploadTimestamp,
   getLastUploadAt,
   setLastUploadAt,
 } from "@/lib/storage/uploadMetadata";
+import { addStudents } from "./lib/storage/addStudents";
+import { hasStudents } from "./lib/storage/hasStudents";
+
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 import type { StatusTone } from "./types/component.types";
+import { listAll } from "./lib/storage/listAll";
 
 export default function App() {
   //dados extraídos da planilha upload
   const [rawSpreadsheetData, setRawSpreadsheetData] = useState<
     SpreadsheetStudentType[]
   >([]);
+
   //nome da planilha selecionada
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
@@ -30,6 +36,30 @@ export default function App() {
     () => getLastUploadAt() ?? "",
   );
 
+  const [hasStoredStudents, setHasStoredStudents] = useState<boolean | null>(
+    null,
+  );
+
+  useEffect(() => {
+    async function checkStoredStudents() {
+      const exists = await hasStudents();
+      setHasStoredStudents(exists);
+      
+      if (exists) {
+        setStatusTone("default");
+        const students = await listAll();
+        setRawSpreadsheetData(students);
+        setStatusMessage("Dados carregados. Busca liberada.");
+      } else {
+        setStatusTone("warning");
+        setStatusMessage("Carregue a planilha para liberar a busca.");
+      }
+    }
+
+    void checkStoredStudents();
+  }, []);
+
+  //Função para processar o upload da planilha e converter para objeto
   async function processSpreadsheetUpload(
     event: ChangeEvent<HTMLInputElement>,
   ) {
@@ -64,19 +94,26 @@ export default function App() {
       //momento que converte a planilha para objeto JSON
       const parsedRows = await parseSpreadsheetFile(file);
       console.log(parsedRows);
+
+      if (parsedRows.length === 0) {
+         throw Error("Esta planilha está vazia");
+      }
+
       const currentUploadAt = new Date().toISOString();
+
+      //Adicionando ao banco IndexedDB
+      await addStudents(parsedRows);
 
       setRawSpreadsheetData(parsedRows);
       setSelectedFileName(file.name);
+      setHasStoredStudents(true);
       setPersistedUploadAt(currentUploadAt);
       setLastUploadAt(currentUploadAt);
       setStatusTone("success");
       setStatusMessage(
         `${parsedRows.length} registro(s) carregado(s) da planilha.`,
       );
-    } catch (error) {
-      console.log(error);
-
+    } catch {
       setRawSpreadsheetData([]);
       setSelectedFileName(file.name);
       setStatusTone("error");
@@ -118,6 +155,7 @@ export default function App() {
         </section>
         <aside aria-labelledby="resultados-heading">
           <h2 id="resultados-heading">Resultados da pesquisa</h2>
+          {JSON.stringify(rawSpreadsheetData[0], null, 2)}
         </aside>
         <section aria-labelledby="dados-heading">
           <h2 id="dados-heading">Dados principais</h2>

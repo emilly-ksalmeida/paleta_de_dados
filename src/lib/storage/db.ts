@@ -1,24 +1,12 @@
-// db.ts
-// db.ts
 import { Dexie, type EntityTable } from "dexie";
+import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 
-interface Friend {
-  id: number;
-  name: string;
-  age: number;
-}
-
-const db = new Dexie("FriendsDatabase") as Dexie & {
-  friends: EntityTable<
-    Friend,
-    "id" // primary key "id" (for the typings only)
-  >;
+const db = new Dexie("StudentsDatabase") as Dexie & {
+  students: EntityTable<SpreadsheetStudentType>;
 };
 
-// Schema declaration:
 db.version(1).stores({
-  friends: "++id, name, age", // primary key "id" (for the runtime!)
+  students: "++, nome_completo" 
 });
 
-export type { Friend };
 export { db };

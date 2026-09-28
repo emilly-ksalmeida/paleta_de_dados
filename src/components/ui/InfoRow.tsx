@@ -5,7 +5,7 @@ interface InfoRowProps {
 
 export function InfoRow({ label, value }: InfoRowProps) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-row gap-5 items-center">
       <dt className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
         {label}
       </dt>

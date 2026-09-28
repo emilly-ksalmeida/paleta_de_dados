@@ -15,7 +15,7 @@ export function StudentDetailCard({
   onEdit,
 }: StudentDetailCardProps) {
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden max-w-[800px] mx-auto">
       <div className="border-b border-border bg-success-light px-6 py-4">
         <h2
           id="dados-heading"
@@ -50,16 +50,16 @@ export function StudentDetailCard({
                 value={student.nome_mae_ou_responsavel.trim()}
               />
               <InfoRow
-                label="Tel. do responsável"
+                label="Telefone do responsável"
                 value={student.telefone_responsavel.trim()}
-              />
-              <InfoRow
-                label="Inf. médicas"
-                value={(student.informacoes_saude ?? "").trim()}
               />
               <InfoRow
                 label="Curso"
                 value={(student.cursos_disponiveis ?? "").trim()}
+              />
+              <InfoRow
+                label="Informações médicas"
+                value={(student.informacoes_saude ?? "").trim()}
               />
             </dl>
             <div className="mt-5 flex gap-2 border-t border-border pt-4">

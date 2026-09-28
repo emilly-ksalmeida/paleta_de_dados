@@ -2,6 +2,7 @@ import { useEffect, useState, type ChangeEvent } from "react";
 
 import { SpreadsheetUploadCard } from "./components/SpreadsheetUploadCard";
 import { StudentDetailCard } from "./components/StudentDetailCard";
+import { StudentSearchCard } from "./components/StudentSearchCard";
 import { Header } from "./components/Header";
 
 import { mockStudent } from "@/lib/mock/mockStudent";
@@ -41,6 +42,9 @@ export default function App() {
   const [hasStoredStudents, setHasStoredStudents] = useState<boolean | null>(
     null,
   );
+
+  //termo digitado na barra de busca
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     async function checkStoredStudents() {
@@ -95,7 +99,6 @@ export default function App() {
     try {
       //momento que converte a planilha para objeto JSON
       const parsedRows = await parseSpreadsheetFile(file);
-      console.log(parsedRows);
 
       if (parsedRows.length === 0) {
          throw Error("Esta planilha está vazia");
@@ -149,11 +152,14 @@ export default function App() {
           />
         </section>
         <section aria-labelledby="busca-heading">
-          <h2 id="busca-heading">Área de busca</h2>
+          <StudentSearchCard
+            hasSpreadsheetData={hasStoredStudents}
+            searchTerm={searchTerm}
+            onSearchTermChange={setSearchTerm}
+          />
         </section>
         <aside aria-labelledby="resultados-heading">
           <h2 id="resultados-heading">Resultados da pesquisa</h2>
-          {JSON.stringify(rawSpreadsheetData[0], null, 2)}
         </aside>
         <section aria-labelledby="dados-heading">
           <StudentDetailCard student={mockStudent} />

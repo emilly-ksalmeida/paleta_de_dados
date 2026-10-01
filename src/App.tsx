@@ -1,8 +1,9 @@
 import { useEffect, useState, type ChangeEvent } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 
 import { SpreadsheetUploadCard } from "./components/SpreadsheetUploadCard";
 import { StudentDetailCard } from "./components/StudentDetailCard";
-import { StudentSearchCard } from "./components/StudentSearchCard";
+import { StudentSearchArea } from "./components/StudentSearchArea";
 import { Header } from "./components/Header";
 
 import { mockStudent } from "@/lib/mock/mockStudent";
@@ -15,46 +16,46 @@ import {
 import { addStudents } from "./lib/storage/addStudents";
 import { hasStudents } from "./lib/storage/hasStudents";
 
-import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 import type { StatusTone } from "./types/component.types";
-import { listAll } from "./lib/storage/listAll";
+
+import { searchStudentsByName } from "./lib/storage/searchStudents";
+import { StudentSearchResults } from "./components/StudentSearchResults";
 
 export default function App() {
-  //dados extraídos da planilha upload
-  const [rawSpreadsheetData, setRawSpreadsheetData] = useState<
-    SpreadsheetStudentType[]
-  >([]);
+  // estilo
+  const [statusTone, setStatusTone] = useState<StatusTone>("warning");
+
+  // UPLOAD
 
   //nome da planilha selecionada
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
+  // mensagem de status para upload
   const [statusMessage, setStatusMessage] = useState(
     "Carregue a planilha para liberar a busca.",
   );
-  const [statusTone, setStatusTone] = useState<StatusTone>("warning");
 
+  // status do parse da planilha
   const [isParsing, setIsParsing] = useState(false);
 
+  // salvar data e hora do último upload
   const [persistedUploadAt, setPersistedUploadAt] = useState(
     () => getLastUploadAt() ?? "",
   );
 
+  // status dados da planilha salvos no indexedDB
   const [hasStoredStudents, setHasStoredStudents] = useState<boolean | null>(
     null,
   );
 
-  //termo digitado na barra de busca
-  const [searchTerm, setSearchTerm] = useState("");
-
+  // verifica se tem dados no banco
   useEffect(() => {
     async function checkStoredStudents() {
       const exists = await hasStudents();
       setHasStoredStudents(exists);
-      
+
       if (exists) {
         setStatusTone("default");
-        const students = await listAll();
-        setRawSpreadsheetData(students);
         setStatusMessage("Dados carregados. Busca liberada.");
       } else {
         setStatusTone("warning");
@@ -82,7 +83,6 @@ export default function App() {
       fileName.endsWith(".csv");
 
     if (!isSupportedFile) {
-      setRawSpreadsheetData([]);
       setSelectedFileName(file.name);
       setStatusTone("error");
       setStatusMessage(
@@ -101,7 +101,7 @@ export default function App() {
       const parsedRows = await parseSpreadsheetFile(file);
 
       if (parsedRows.length === 0) {
-         throw Error("Esta planilha está vazia");
+        throw Error("Esta planilha está vazia");
       }
 
       const currentUploadAt = new Date().toISOString();
@@ -109,7 +109,6 @@ export default function App() {
       //Adicionando ao banco IndexedDB
       await addStudents(parsedRows);
 
-      setRawSpreadsheetData(parsedRows);
       setSelectedFileName(file.name);
       setHasStoredStudents(true);
       setPersistedUploadAt(currentUploadAt);
@@ -119,7 +118,6 @@ export default function App() {
         `${parsedRows.length} registro(s) carregado(s) da planilha.`,
       );
     } catch {
-      setRawSpreadsheetData([]);
       setSelectedFileName(file.name);
       setStatusTone("error");
       setStatusMessage("Não foi possível ler a planilha enviada.");
@@ -137,9 +135,23 @@ export default function App() {
     ? formatUploadTimestamp(persistedUploadAt)
     : "";
 
+  // AREA DE BUSCA
+
+  // const [selectedStudent, setSelectedStudent] =
+  //   useState<SpreadsheetStudentType | null>(null);
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const filteredStudents = useLiveQuery(async () => {
+    if (!searchTerm) return [];
+    const students = await searchStudentsByName(searchTerm);
+    return students;
+  }, [searchTerm]);
+
   return (
     <div>
       <Header />
+
       <main className="container mx-auto flex flex-col gap-5 pt-5">
         <section aria-labelledby="upload-heading">
           <SpreadsheetUploadCard
@@ -151,16 +163,19 @@ export default function App() {
             onFileChange={handleFileChange}
           />
         </section>
-        <section aria-labelledby="busca-heading">
-          <StudentSearchCard
-            hasSpreadsheetData={hasStoredStudents}
+
+        <section
+          aria-labelledby="busca-heading"
+          className="flex flex-col gap-5 rounded-xl border bg-card p-8 shadow"
+        >
+          <StudentSearchArea setSearchTerm={setSearchTerm} statusMessage={statusMessage}/>
+
+          <StudentSearchResults
+            filteredStudents={filteredStudents}
             searchTerm={searchTerm}
-            onSearchTermChange={setSearchTerm}
           />
         </section>
-        <aside aria-labelledby="resultados-heading">
-          <h2 id="resultados-heading">Resultados da pesquisa</h2>
-        </aside>
+
         <section aria-labelledby="dados-heading">
           <StudentDetailCard student={mockStudent} />
         </section>

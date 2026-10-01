@@ -2,15 +2,20 @@ import { Users } from "lucide-react";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
+import { Button } from "./ui/button";
 
 interface StudentSearchResultsProps {
   filteredStudents?: SpreadsheetStudentType[];
   searchTerm: string;
+  setSelectedStudent: React.Dispatch<
+    React.SetStateAction<SpreadsheetStudentType | null>
+  >;
 }
 
 export function StudentSearchResults({
   filteredStudents,
   searchTerm,
+  setSelectedStudent  
 }: StudentSearchResultsProps) {
   const students = filteredStudents ?? [];
   const hasSearched = searchTerm.trim().length > 0;
@@ -47,15 +52,18 @@ export function StudentSearchResults({
       </p>
 
       {hasResults ? (
-        <ScrollArea className="h-40">
+        <ScrollArea className="h-52">
           <div className="flex flex-col gap-4 bg-muted px-10 py-5">
             {students.map((student) => (
-              <div
-                className="rounded-lg border border-primary/30 bg-primary/10 p-2"
+              <Button
+              variant="outline"
                 key={`${student.nome_completo}-${student.telefone_para_contato}`}
+                className="flex flex-row justify-between"
+                onClick={() => setSelectedStudent(student)}
               >
-                <p>{student.nome_completo}</p>
-              </div>
+                <span>{student.nome_completo}</span>
+                <span>Curso - turma</span>
+              </Button>
             ))}
           </div>
         </ScrollArea>

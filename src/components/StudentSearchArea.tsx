@@ -21,9 +21,10 @@ type SearchFormValues = z.infer<typeof searchSchema>;
 interface StudentSearchCardProps {
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   statusMessage: string;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function StudentSearchArea({ setSearchTerm, statusMessage }: StudentSearchCardProps) {
+export function StudentSearchArea({ setSearchTerm, statusMessage, setIsOpen }: StudentSearchCardProps) {
   const {
     register,
     handleSubmit,
@@ -35,6 +36,7 @@ export function StudentSearchArea({ setSearchTerm, statusMessage }: StudentSearc
 
   const search: SubmitHandler<SearchFormValues> = (data: SearchFormValues) => {
     setSearchTerm(data.searchTerm);
+    setIsOpen(false);
   };
 
   const errorId = "student-search-error";

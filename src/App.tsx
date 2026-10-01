@@ -4,9 +4,9 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { SpreadsheetUploadCard } from "./components/SpreadsheetUploadCard";
 import { StudentDetailCard } from "./components/StudentDetailCard";
 import { StudentSearchArea } from "./components/StudentSearchArea";
+import { StudentSearchResults } from "./components/StudentSearchResults";
 import { Header } from "./components/Header";
 
-import { mockStudent } from "@/lib/mock/mockStudent";
 import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
 import {
   formatUploadTimestamp,
@@ -15,18 +15,18 @@ import {
 } from "@/lib/storage/uploadMetadata";
 import { addStudents } from "./lib/storage/addStudents";
 import { hasStudents } from "./lib/storage/hasStudents";
+import { searchStudentsByName } from "./lib/storage/searchStudents";
 
 import type { StatusTone } from "./types/component.types";
+import type { SpreadsheetStudentType } from "./types/spreadsheetStudentType";
 
-import { searchStudentsByName } from "./lib/storage/searchStudents";
-import { StudentSearchResults } from "./components/StudentSearchResults";
 
 export default function App() {
   // estilo
   const [statusTone, setStatusTone] = useState<StatusTone>("warning");
 
   // UPLOAD
-
+  const [isOpen, setIsOpen] = useState(true);
   //nome da planilha selecionada
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
@@ -43,17 +43,11 @@ export default function App() {
     () => getLastUploadAt() ?? "",
   );
 
-  // status dados da planilha salvos no indexedDB
-  const [hasStoredStudents, setHasStoredStudents] = useState<boolean | null>(
-    null,
-  );
-
   // verifica se tem dados no banco
   useEffect(() => {
     async function checkStoredStudents() {
       const exists = await hasStudents();
-      setHasStoredStudents(exists);
-
+     
       if (exists) {
         setStatusTone("default");
         setStatusMessage("Dados carregados. Busca liberada.");
@@ -110,7 +104,6 @@ export default function App() {
       await addStudents(parsedRows);
 
       setSelectedFileName(file.name);
-      setHasStoredStudents(true);
       setPersistedUploadAt(currentUploadAt);
       setLastUploadAt(currentUploadAt);
       setStatusTone("success");
@@ -137,8 +130,8 @@ export default function App() {
 
   // AREA DE BUSCA
 
-  // const [selectedStudent, setSelectedStudent] =
-  //   useState<SpreadsheetStudentType | null>(null);
+  const [selectedStudent, setSelectedStudent] =
+    useState<SpreadsheetStudentType | null>(null);
 
   const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -153,7 +146,10 @@ export default function App() {
       <Header />
 
       <main className="container mx-auto flex flex-col gap-5 pt-5">
-        <section aria-labelledby="upload-heading">
+        <section
+          aria-labelledby="upload-heading"
+          className="flex flex-col gap-5 rounded-xl border bg-card px-8 py-4 shadow"
+        >
           <SpreadsheetUploadCard
             selectedFileName={selectedFileName}
             isParsing={isParsing}
@@ -161,6 +157,8 @@ export default function App() {
             statusTone={statusTone}
             lastUploadLabel={lastUploadLabel}
             onFileChange={handleFileChange}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
           />
         </section>
 
@@ -168,16 +166,21 @@ export default function App() {
           aria-labelledby="busca-heading"
           className="flex flex-col gap-5 rounded-xl border bg-card p-8 shadow"
         >
-          <StudentSearchArea setSearchTerm={setSearchTerm} statusMessage={statusMessage}/>
+          <StudentSearchArea
+            setSearchTerm={setSearchTerm}
+            statusMessage={statusMessage}
+            setIsOpen={setIsOpen}
+          />
 
           <StudentSearchResults
             filteredStudents={filteredStudents}
             searchTerm={searchTerm}
+            setSelectedStudent={setSelectedStudent}
           />
         </section>
 
         <section aria-labelledby="dados-heading">
-          <StudentDetailCard student={mockStudent} />
+          <StudentDetailCard selectedStudent={selectedStudent} />
         </section>
       </main>
     </div>

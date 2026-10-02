@@ -1,6 +1,10 @@
 import { useEffect, useState, type ChangeEvent } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 
 import { SpreadsheetUploadCard } from "./components/SpreadsheetUploadCard";
+import { StudentDetailCard } from "./components/StudentDetailCard";
+import { StudentSearchArea } from "./components/StudentSearchArea";
+import { StudentSearchResults } from "./components/StudentSearchResults";
 import { Header } from "./components/Header";
 
 import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
@@ -11,44 +15,41 @@ import {
 } from "@/lib/storage/uploadMetadata";
 import { addStudents } from "./lib/storage/addStudents";
 import { hasStudents } from "./lib/storage/hasStudents";
+import { searchStudentsByName } from "./lib/storage/searchStudents";
 
-import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 import type { StatusTone } from "./types/component.types";
-import { listAll } from "./lib/storage/listAll";
+import type { SpreadsheetStudentType } from "./types/spreadsheetStudentType";
+
 
 export default function App() {
-  //dados extraídos da planilha upload
-  const [rawSpreadsheetData, setRawSpreadsheetData] = useState<
-    SpreadsheetStudentType[]
-  >([]);
+  // estilo
+  const [statusTone, setStatusTone] = useState<StatusTone>("warning");
 
+  // UPLOAD
+  const [isOpen, setIsOpen] = useState(true);
   //nome da planilha selecionada
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
+  // mensagem de status para upload
   const [statusMessage, setStatusMessage] = useState(
     "Carregue a planilha para liberar a busca.",
   );
-  const [statusTone, setStatusTone] = useState<StatusTone>("warning");
 
+  // status do parse da planilha
   const [isParsing, setIsParsing] = useState(false);
 
+  // salvar data e hora do último upload
   const [persistedUploadAt, setPersistedUploadAt] = useState(
     () => getLastUploadAt() ?? "",
   );
 
-  const [hasStoredStudents, setHasStoredStudents] = useState<boolean | null>(
-    null,
-  );
-
+  // verifica se tem dados no banco
   useEffect(() => {
     async function checkStoredStudents() {
       const exists = await hasStudents();
-      setHasStoredStudents(exists);
-      
+     
       if (exists) {
         setStatusTone("default");
-        const students = await listAll();
-        setRawSpreadsheetData(students);
         setStatusMessage("Dados carregados. Busca liberada.");
       } else {
         setStatusTone("warning");
@@ -76,7 +77,6 @@ export default function App() {
       fileName.endsWith(".csv");
 
     if (!isSupportedFile) {
-      setRawSpreadsheetData([]);
       setSelectedFileName(file.name);
       setStatusTone("error");
       setStatusMessage(
@@ -93,10 +93,9 @@ export default function App() {
     try {
       //momento que converte a planilha para objeto JSON
       const parsedRows = await parseSpreadsheetFile(file);
-      console.log(parsedRows);
 
       if (parsedRows.length === 0) {
-         throw Error("Esta planilha está vazia");
+        throw Error("Esta planilha está vazia");
       }
 
       const currentUploadAt = new Date().toISOString();
@@ -104,9 +103,7 @@ export default function App() {
       //Adicionando ao banco IndexedDB
       await addStudents(parsedRows);
 
-      setRawSpreadsheetData(parsedRows);
       setSelectedFileName(file.name);
-      setHasStoredStudents(true);
       setPersistedUploadAt(currentUploadAt);
       setLastUploadAt(currentUploadAt);
       setStatusTone("success");
@@ -114,7 +111,6 @@ export default function App() {
         `${parsedRows.length} registro(s) carregado(s) da planilha.`,
       );
     } catch {
-      setRawSpreadsheetData([]);
       setSelectedFileName(file.name);
       setStatusTone("error");
       setStatusMessage("Não foi possível ler a planilha enviada.");
@@ -132,33 +128,59 @@ export default function App() {
     ? formatUploadTimestamp(persistedUploadAt)
     : "";
 
-  const shouldWarnAboutMissingData =
-    rawSpreadsheetData.length === 0 && Boolean(persistedUploadAt);
+  // AREA DE BUSCA
+
+  const [selectedStudent, setSelectedStudent] =
+    useState<SpreadsheetStudentType | null>(null);
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const filteredStudents = useLiveQuery(async () => {
+    if (!searchTerm) return [];
+    const students = await searchStudentsByName(searchTerm);
+    return students;
+  }, [searchTerm]);
 
   return (
     <div>
       <Header />
+
       <main className="container mx-auto flex flex-col gap-5 pt-5">
-        <section aria-labelledby="upload-heading">
+        <section
+          aria-labelledby="upload-heading"
+          className="flex flex-col gap-5 rounded-xl border bg-card px-8 py-4 shadow"
+        >
           <SpreadsheetUploadCard
             selectedFileName={selectedFileName}
             isParsing={isParsing}
             statusMessage={statusMessage}
             statusTone={statusTone}
             lastUploadLabel={lastUploadLabel}
-            shouldWarnAboutMissingData={shouldWarnAboutMissingData}
             onFileChange={handleFileChange}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
           />
         </section>
-        <section aria-labelledby="busca-heading">
-          <h2 id="busca-heading">Área de busca</h2>
+
+        <section
+          aria-labelledby="busca-heading"
+          className="flex flex-col gap-5 rounded-xl border bg-card p-8 shadow"
+        >
+          <StudentSearchArea
+            setSearchTerm={setSearchTerm}
+            statusMessage={statusMessage}
+            setIsOpen={setIsOpen}
+          />
+
+          <StudentSearchResults
+            filteredStudents={filteredStudents}
+            searchTerm={searchTerm}
+            setSelectedStudent={setSelectedStudent}
+          />
         </section>
-        <aside aria-labelledby="resultados-heading">
-          <h2 id="resultados-heading">Resultados da pesquisa</h2>
-          {JSON.stringify(rawSpreadsheetData[0], null, 2)}
-        </aside>
+
         <section aria-labelledby="dados-heading">
-          <h2 id="dados-heading">Dados principais</h2>
+          <StudentDetailCard selectedStudent={selectedStudent} />
         </section>
       </main>
     </div>

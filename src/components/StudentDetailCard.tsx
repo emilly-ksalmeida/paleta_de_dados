@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { InfoRow } from "@/components/ui/InfoRow";
+import { formatDisplayName } from "@/lib/format/displayName";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 
 interface StudentDetailCardProps {
@@ -23,7 +24,7 @@ export function StudentDetailCard({
         </h2>
         {selectedStudent ? (
           <p className="mt-0.5 text-lg font-bold text-foreground">
-            {selectedStudent.nome_completo}
+            {formatDisplayName(selectedStudent.nome_completo)}
           </p>
         ) : (
           <p className="mt-0.5 text-lg font-semibold text-muted-foreground">

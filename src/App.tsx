@@ -7,7 +7,7 @@ import { StudentSearchArea } from "./components/StudentSearchArea";
 import { StudentSearchResults } from "./components/StudentSearchResults";
 import { Header } from "./components/Header";
 
-import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
+import { normalizeKey, parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
 import {
   formatUploadTimestamp,
   getLastUploadAt,
@@ -137,7 +137,7 @@ export default function App() {
 
   const filteredStudents = useLiveQuery(async () => {
     if (!searchTerm) return [];
-    const students = await searchStudentsByName(searchTerm);
+    const students = await searchStudentsByName(normalizeKey(searchTerm));
     return students;
   }, [searchTerm]);
 

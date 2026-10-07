@@ -12,7 +12,7 @@ const searchSchema = z.object({
     .string()
     .trim()
     .min(2, "Digite pelo menos 2 caracteres.")
-    .regex(/^[A-Za-z ]+$/, "Use apenas letras e espaços.")
+    .regex(/^[\p{L} ]+$/u, "Use apenas letras e espaços.")
     .refine((value) => !/ {2,}/.test(value), "Não use espaços seguidos."),
 });
 

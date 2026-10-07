@@ -70,7 +70,7 @@ function parseDate(value: string): Date | null {
   return null;
 }
 
-function normalizeKey(value: string) {
+export function normalizeKey(value: string) {
   return value
     .normalize("NFD")
     .replaceAll(/[\u0300-\u036f]/g, "")
@@ -149,7 +149,9 @@ export async function parseSpreadsheetFile(
         curso_noturno: readField(normalizedRow, "curso_noturno"),
         dia_semana_regular_2: readField(normalizedRow, "dia_semana_regular_2"),
         horario: readField(normalizedRow, "horario"),
-        nome_completo: readField(normalizedRow, "nome_completo"),
+        nome_completo: normalizeKey(
+          readField(normalizedRow, "nome_completo"),
+        ),
         idade: readField(normalizedRow, "idade"),
         data_nascimento: readField(normalizedRow, "data_nascimento"),
         pcd: readField(normalizedRow, "pcd"),

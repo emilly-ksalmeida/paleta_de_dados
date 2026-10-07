@@ -1,6 +1,7 @@
 import { Users } from "lucide-react";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { formatDisplayName } from "@/lib/format/displayName";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 import { Button } from "./ui/button";
 
@@ -61,7 +62,7 @@ export function StudentSearchResults({
                 className="flex flex-row justify-between"
                 onClick={() => setSelectedStudent(student)}
               >
-                <span>{student.nome_completo}</span>
+                <span>{formatDisplayName(student.nome_completo)}</span>
                 <span>Curso - turma</span>
               </Button>
             ))}

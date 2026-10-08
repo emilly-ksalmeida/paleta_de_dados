@@ -92,23 +92,28 @@ export default function App() {
 
     try {
       //momento que converte a planilha para objeto JSON
-      const parsedRows = await parseSpreadsheetFile(file);
+      const result = await parseSpreadsheetFile(file);
 
-      if (parsedRows.length === 0) {
-        throw Error("Esta planilha está vazia");
+      if (!result.success) {
+        setSelectedFileName(file.name);
+        setStatusTone("error");
+        setStatusMessage(
+          `Coluna(s) obrigatória(s) ausente(s): ${result.message.join(", ")}.`,
+        );
+        return;
       }
 
       const currentUploadAt = new Date().toISOString();
 
       //Adicionando ao banco IndexedDB
-      await addStudents(parsedRows);
+      await addStudents(result.message);
 
       setSelectedFileName(file.name);
       setPersistedUploadAt(currentUploadAt);
       setLastUploadAt(currentUploadAt);
       setStatusTone("success");
       setStatusMessage(
-        `${parsedRows.length} registro(s) carregado(s) da planilha.`,
+        `${result.message.length} registro(s) carregado(s) da planilha.`,
       );
     } catch {
       setSelectedFileName(file.name);

@@ -1,6 +1,7 @@
 import * as XLSX from "xlsx";
 import { parse, isValid, format } from "date-fns";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
+import type { ParseSpreadsheetResult } from "@/types/parseSpreadsheetResult";
 
 const FIELD_ALIASES: Record<keyof SpreadsheetStudentType, string[]> = {
   qual_a_sua_idade: ["Qual a sua idade?"],
@@ -51,6 +52,17 @@ const FIELD_ALIASES: Record<keyof SpreadsheetStudentType, string[]> = {
     "Declaro que li e estou ciente das condições estabelecidas pela Secretaria Municipal de Cultura e Turismo da Prefeitura Municipal de Anápolis para participação na Escola de Artes de Anápolis Oswaldo Verano, responsabilizando-me pela veracidade das informações prestadas.",
   ],
 };
+
+const REQUIRED_COLUMNS = [
+  "nome_completo",
+  "idade",
+  "data_nascimento",
+  "telefone_para_contato",
+  "telefone_responsavel",
+  "documento_aluno",
+  "documento_responsavel",
+  "comprovante_endereco",
+] satisfies (keyof SpreadsheetStudentType)[];
 
 function parseDate(value: string): Date | null {
   const cleanValue = value.replace(/\D/g, "");
@@ -114,14 +126,36 @@ function readField(
   return "";
 }
 
+function validateRequiredColumns(normalizeHeaderKeys: string[]) {
+  const headerSet = new Set(normalizeHeaderKeys); // lista de cabeçalho da planilha carregada
+
+  const missingColumns = REQUIRED_COLUMNS.filter((field) => {
+    // buscando o nome da coluna obrigatória dentro do objeto que reune os cabeçalhos de interesse e como eles podem estar aparecendo na lista de cabeçalho da planilha carregada - FIELD_ALIASES
+    const hasAlias = FIELD_ALIASES[field].some((alias) =>
+      headerSet.has(normalizeKey(alias)),
+    );
+    return !hasAlias;
+  });
+
+  return {
+    isValid: missingColumns.length === 0,
+    missingColumns,
+  };
+}
+
 export async function parseSpreadsheetFile(
   file: File,
-): Promise<SpreadsheetStudentType[]> {
+): Promise<ParseSpreadsheetResult> {
   const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
   const sheetName = workbook.SheetNames[0];
 
   if (!sheetName) {
-    return [];
+    return {
+      success: false,
+      message: [
+        "Não foi possível ler os dados da planilha. Verifique se o arquivo possui uma aba com dados e se os dados dos alunos estão na primeira aba da planilha.",
+      ],
+    };
   }
 
   const sheet = workbook.Sheets[sheetName];
@@ -130,7 +164,18 @@ export async function parseSpreadsheetFile(
     defval: "",
   });
 
-  return rawRows
+  const headerKeys = Object.keys(rawRows[0] ?? {}).map((key)=> normalizeKey(key));
+
+  const headerValidation = validateRequiredColumns(headerKeys);
+
+  if (!headerValidation.isValid) {
+    return {
+      success: false,
+      message: headerValidation.missingColumns,
+    };
+  }
+
+  const rows = rawRows
     .map((row) => {
       const normalizedRow: Record<string, string> = {};
 
@@ -149,9 +194,7 @@ export async function parseSpreadsheetFile(
         curso_noturno: readField(normalizedRow, "curso_noturno"),
         dia_semana_regular_2: readField(normalizedRow, "dia_semana_regular_2"),
         horario: readField(normalizedRow, "horario"),
-        nome_completo: normalizeKey(
-          readField(normalizedRow, "nome_completo"),
-        ),
+        nome_completo: normalizeKey(readField(normalizedRow, "nome_completo")),
         idade: readField(normalizedRow, "idade"),
         data_nascimento: readField(normalizedRow, "data_nascimento"),
         pcd: readField(normalizedRow, "pcd"),
@@ -184,4 +227,6 @@ export async function parseSpreadsheetFile(
       };
     })
     .filter((row) => Object.values(row).some(Boolean));
+
+  return { success: true, message: rows };
 }

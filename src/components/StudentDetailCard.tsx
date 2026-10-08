@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { InfoRow } from "@/components/ui/InfoRow";
+import { formatBirthDate } from "@/lib/format/birthDate";
 import { formatDisplayName } from "@/lib/format/displayName";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 
@@ -8,9 +9,7 @@ interface StudentDetailCardProps {
   selectedStudent: SpreadsheetStudentType | null;
 }
 
-export function StudentDetailCard({
-  selectedStudent
-}: StudentDetailCardProps) {
+export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
   const photoUrl = selectedStudent?.foto_3x4?.trim() ?? "";
 
   return (
@@ -53,6 +52,10 @@ export function StudentDetailCard({
                 value={selectedStudent.telefone_responsavel.trim()}
               />
               <InfoRow
+                label="Data de nascimento"
+                value={formatBirthDate(selectedStudent.data_nascimento)}
+              />
+              <InfoRow
                 label="Curso"
                 value={(selectedStudent.cursos_disponiveis ?? "").trim()}
               />
@@ -64,11 +67,7 @@ export function StudentDetailCard({
             <div className="mt-5 flex gap-2 border-t border-border pt-4">
               {photoUrl ? (
                 <Button asChild variant="outline" className="flex-1">
-                  <a
-                    href={photoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href={photoUrl} target="_blank" rel="noopener noreferrer">
                     Visualizar foto
                   </a>
                 </Button>

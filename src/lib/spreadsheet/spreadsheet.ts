@@ -153,7 +153,7 @@ export async function parseSpreadsheetFile(
     return {
       success: false,
       message: [
-        "Não foi possível ler os dados da planilha. Verifique se o arquivo possui uma aba com dados e se os dados dos alunos estão na primeira aba da planilha.",
+        "Não foi possível ler os dados da planilha. Verifique se o arquivo possui uma aba com dados e se os dados dos alunos estão na primeira aba da planilha",
       ],
     };
   }
@@ -164,7 +164,18 @@ export async function parseSpreadsheetFile(
     defval: "",
   });
 
-  const headerKeys = Object.keys(rawRows[0] ?? {}).map((key)=> normalizeKey(key));
+  if (!rawRows[0]) {
+    return {
+      success: false,
+      message: [
+        "Não foi possível ler os dados da planilha. Verifique se o arquivo possui uma aba com dados e se os dados dos alunos estão na primeira aba da planilha",
+      ],
+    };
+  }
+
+  const headerKeys = Object.keys(rawRows[0] ?? {}).map((key) =>
+    normalizeKey(key),
+  );
 
   const headerValidation = validateRequiredColumns(headerKeys);
 

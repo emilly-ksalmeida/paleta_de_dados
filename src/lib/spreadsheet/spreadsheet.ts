@@ -1,5 +1,4 @@
 import * as XLSX from "xlsx";
-import { parse, isValid, format } from "date-fns";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 import type { ParseSpreadsheetResult } from "@/types/parseSpreadsheetResult";
 
@@ -64,24 +63,6 @@ const REQUIRED_COLUMNS = [
   "comprovante_endereco",
 ] satisfies (keyof SpreadsheetStudentType)[];
 
-function parseDate(value: string): Date | null {
-  const cleanValue = value.replace(/\D/g, "");
-
-  if (cleanValue.length === 8) {
-    const parsedDate = parse(cleanValue, "ddMMyyyy", new Date());
-
-    return isValid(parsedDate) ? parsedDate : null;
-  }
-
-  if (cleanValue.length === 6) {
-    const parsedDate = parse(cleanValue, "ddMMyy", new Date(2000, 0, 1));
-
-    return isValid(parsedDate) ? parsedDate : null;
-  }
-
-  return null;
-}
-
 export function normalizeKey(value: string) {
   return value
     .normalize("NFD")
@@ -97,10 +78,6 @@ function toText(value: unknown): string {
   }
 
   if (typeof value === "string") {
-    const date = parseDate(value);
-    if (date) {
-      return format(date, "dd/MM/yyyy");
-    }
     return value.trim();
   }
 
@@ -146,7 +123,10 @@ function validateRequiredColumns(normalizeHeaderKeys: string[]) {
 export async function parseSpreadsheetFile(
   file: File,
 ): Promise<ParseSpreadsheetResult> {
-  const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
+  const workbook = XLSX.read(await file.arrayBuffer(), {
+    type: "array",
+    raw: true,
+  });
   const sheetName = workbook.SheetNames[0];
 
   if (!sheetName) {

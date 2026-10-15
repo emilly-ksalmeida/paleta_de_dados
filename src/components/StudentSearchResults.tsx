@@ -2,6 +2,7 @@ import { Users } from "lucide-react";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDisplayName } from "@/lib/format/displayName";
+import getStudentCourseClass from "@/lib/spreadsheet/getStudentCourse";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 import { Button } from "./ui/button";
 
@@ -55,17 +56,24 @@ export function StudentSearchResults({
       {hasResults ? (
         <ScrollArea className="h-52">
           <div className="flex flex-col gap-4 bg-muted px-10 py-5">
-            {students.map((student) => (
-              <Button
-              variant="outline"
-                key={`${student.nome_completo}-${student.telefone_para_contato}`}
-                className="flex flex-row justify-between"
-                onClick={() => setSelectedStudent(student)}
-              >
-                <span>{formatDisplayName(student.nome_completo)}</span>
-                <span>Curso - turma</span>
-              </Button>
-            ))}
+            {students.map((student) => {
+              const courseClass = getStudentCourseClass(student);
+
+              return (
+                <Button
+                  variant="outline"
+                  key={`${student.nome_completo}-${student.telefone_para_contato}`}
+                  className="flex flex-col min-h-16 justify-start items-start"
+                  onClick={() => setSelectedStudent(student)}
+                >
+                  <span>{formatDisplayName(student.nome_completo)}</span>
+                  <span className="text-xs">
+                    {courseClass.studentCourse || "—"} —{" "}
+                    {courseClass.studentClass || "—"}
+                  </span>
+                </Button>
+              );
+            })}
           </div>
         </ScrollArea>
       ) : (

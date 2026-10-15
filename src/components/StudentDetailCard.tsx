@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { InfoRow } from "@/components/ui/InfoRow";
 import { formatBirthDate } from "@/lib/format/birthDate";
 import { formatDisplayName } from "@/lib/format/displayName";
+import getStudentCourseClass from "@/lib/spreadsheet/getStudentCourse";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 
 interface StudentDetailCardProps {
@@ -11,6 +12,8 @@ interface StudentDetailCardProps {
 
 export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
   const photoUrl = selectedStudent?.foto_3x4?.trim() ?? "";
+  const healthInformationUrl = selectedStudent?.laudo_medico?.trim() ?? "";
+  const courseClass = getStudentCourseClass(selectedStudent);
 
   return (
     <Card className="mx-auto max-w-[800px] overflow-hidden">
@@ -55,10 +58,10 @@ export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
                 label="Data de nascimento"
                 value={formatBirthDate(selectedStudent.data_nascimento)}
               />
-              <InfoRow
-                label="Curso"
-                value={(selectedStudent.cursos_disponiveis ?? "").trim()}
-              />
+              <div className="flex gap-2">
+                <InfoRow label="Curso" value={courseClass.studentCourse} />
+                <InfoRow label="Turma" value={courseClass.studentClass} />
+              </div>
               <InfoRow
                 label="Informações médicas"
                 value={(selectedStudent.informacoes_saude ?? "").trim()}
@@ -81,6 +84,28 @@ export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
                   Visualizar foto
                 </Button>
               )}
+
+              {healthInformationUrl ? (
+                <Button asChild variant="outline" className="flex-1">
+                  <a
+                    href={healthInformationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Visualizar laudo
+                  </a>
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  disabled
+                >
+                  Visualizar laudo
+                </Button>
+              )}
+
               {/* <Button
                 type="button"
                 className="flex-1 bg-primary text-primary-foreground hover:bg-primary-hover"

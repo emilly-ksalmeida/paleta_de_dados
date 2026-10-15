@@ -1,12 +1,18 @@
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 
 type couserClassType = {
-    studentCourse: string;
-    studentClass: string;
-}
+  studentCourse: string;
+  studentClass: string;
+};
 export default function getStudentCourseClass(
-  student: SpreadsheetStudentType,
+  student: SpreadsheetStudentType | null,
 ): couserClassType {
+  if (!student) {
+    return {
+      studentCourse: "",
+      studentClass: "",
+    };
+  }
   const courseColumnAliases = [
     student.dia_semana_prep1,
     student.dia_semana_prep2,
@@ -20,11 +26,13 @@ export default function getStudentCourseClass(
     student.dia_semana_regular_2,
   ];
 
-  const studentCourse = courseColumnAliases.find((value) => value?.trim())?.trim() ?? "";
-  const studentClass = classColumnAliases.find((value) => value?.trim())?.trim() ?? "";
+  const studentCourse =
+    courseColumnAliases.find((value) => value?.trim())?.trim() ?? "";
+  const studentClass =
+    classColumnAliases.find((value) => value?.trim())?.trim() ?? "";
 
-return {
+  return {
     studentCourse,
-    studentClass
-}
+    studentClass,
+  };
 }

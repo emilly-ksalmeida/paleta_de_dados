@@ -13,7 +13,7 @@ interface StudentDetailCardProps {
 export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
   const photoUrl = selectedStudent?.foto_3x4?.trim() ?? "";
   const healthInformationUrl = selectedStudent?.laudo_medico?.trim() ?? "";
-  const courseClass = getStudentCourseClass(selectedStudent!);
+  const courseClass = getStudentCourseClass(selectedStudent);
 
   return (
     <Card className="mx-auto max-w-[800px] overflow-hidden">
@@ -59,17 +59,8 @@ export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
                 value={formatBirthDate(selectedStudent.data_nascimento)}
               />
               <div className="flex gap-2">
-                {
-
-                }
-                <InfoRow
-                  label="Curso"
-                  value={courseClass.studentCourse}
-                />
-                <InfoRow
-                  label="Turma"
-                  value={courseClass.studentClass}
-                />
+                <InfoRow label="Curso" value={courseClass.studentCourse} />
+                <InfoRow label="Turma" value={courseClass.studentClass} />
               </div>
               <InfoRow
                 label="Informações médicas"

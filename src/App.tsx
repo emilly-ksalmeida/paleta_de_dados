@@ -11,7 +11,9 @@ import { normalizeKey, parseSpreadsheetFile } from "@/lib/spreadsheet/spreadshee
 import {
   formatUploadTimestamp,
   getLastUploadAt,
+  getLastUploadFileName,
   setLastUploadAt,
+  setLastUploadFileName,
 } from "@/lib/storage/uploadMetadata";
 import { addStudents } from "./lib/storage/addStudents";
 import { hasStudents } from "./lib/storage/hasStudents";
@@ -41,6 +43,11 @@ export default function App() {
   // salvar data e hora do último upload
   const [persistedUploadAt, setPersistedUploadAt] = useState(
     () => getLastUploadAt() ?? "",
+  );
+
+  // salvar nome do arquivo do último upload
+  const [persistedUploadFileName, setPersistedUploadFileName] = useState(
+    () => getLastUploadFileName() ?? "",
   );
 
   // verifica se tem dados no banco
@@ -111,6 +118,8 @@ export default function App() {
       setSelectedFileName(file.name);
       setPersistedUploadAt(currentUploadAt);
       setLastUploadAt(currentUploadAt);
+      setPersistedUploadFileName(file.name);
+      setLastUploadFileName(file.name);
       setStatusTone("success");
       setStatusMessage(
         `${result.message.length} registro(s) carregado(s) da planilha.`,
@@ -129,9 +138,14 @@ export default function App() {
     void processSpreadsheetUpload(event);
   }
 
-  const lastUploadLabel = persistedUploadAt
+  const lastUploadTimestamp = persistedUploadAt
     ? formatUploadTimestamp(persistedUploadAt)
     : "";
+
+  const lastUploadLabel =
+    persistedUploadFileName && lastUploadTimestamp
+      ? `${persistedUploadFileName} — ${lastUploadTimestamp}`
+      : lastUploadTimestamp;
 
   // AREA DE BUSCA
 

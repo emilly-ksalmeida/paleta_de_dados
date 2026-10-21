@@ -2,7 +2,7 @@ import * as XLSX from "xlsx";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 import type { ParseSpreadsheetResult } from "@/types/parseSpreadsheetResult";
 
-const FIELD_ALIASES: Record<keyof SpreadsheetStudentType, string[]> = {
+export const FIELD_ALIASES: Record<keyof SpreadsheetStudentType, string[]> = {
   qual_a_sua_idade: ["Qual a sua idade?"],
   escolha_o_turno: ["Escolha o Turno"],
   dia_semana_prep1: ["Dia da semana para as aulas (Curso Preparatório I) "],

@@ -69,6 +69,20 @@ export default {
         sans: ["Nunito Sans", "sans-serif"],
         dancing: ["Dancing Script", "cursive"],
       },
+      keyframes: {
+        "feedback-in": {
+          from: { opacity: "0", transform: "translateY(-4px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "feedback-out": {
+          from: { opacity: "1", transform: "translateY(0)" },
+          to: { opacity: "0", transform: "translateY(-4px)" },
+        },
+      },
+      animation: {
+        "feedback-in": "feedback-in 200ms ease-out",
+        "feedback-out": "feedback-out 250ms ease-in forwards",
+      },
     },
   },
   plugins: [],

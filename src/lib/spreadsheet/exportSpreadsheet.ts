@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import * as XLSX from "xlsx";
 
 import { listAll } from "@/lib/storage/listAllStudents";
+import { downloadBytesAsFile } from "@/lib/spreadsheet/downloadFile";
 import { FIELD_ALIASES } from "@/lib/spreadsheet/spreadsheet";
 import type { ExportSpreadsheetResult } from "@/types/exportSpreadsheetResult";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
@@ -50,11 +51,16 @@ export async function exportStudentsToXlsx(): Promise<ExportSpreadsheetResult> {
   XLSX.utils.book_append_sheet(workbook, worksheet, EXPORT_SHEET_NAME);
 
   const fileName = buildExportFileName();
-  XLSX.writeFile(workbook, fileName);
+  const bytes = XLSX.write(workbook, {
+    type: "array",
+    bookType: "xlsx",
+  }) as ArrayBuffer;
+
+  downloadBytesAsFile(bytes, fileName);
 
   return {
     success: true,
-    message: `Planilha exportada com sucesso (${rows.length} registro(s)). Arquivo: ${fileName}`,
+    message: `Download iniciado (${rows.length} registro(s)). Arquivo: ${fileName}`,
     exportedCount: rows.length,
   };
 }

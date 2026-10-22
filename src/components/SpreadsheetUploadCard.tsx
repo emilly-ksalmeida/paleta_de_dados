@@ -2,7 +2,6 @@ import { useId, type ChangeEvent } from "react";
 
 import { ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import type { StatusTone } from "@/types/component.types";
 import {
   Collapsible,
@@ -34,7 +33,6 @@ export function SpreadsheetUploadCard({
   isOpen,
   setIsOpen,
 }: SpreadsheetUploadCardProps) {
-  const inputId = useId();
   const hintId = useId();
   const statusId = useId();
 
@@ -49,15 +47,6 @@ export function SpreadsheetUploadCard({
             Carregar Planilha
           </h2>
           <div className="flex items-center gap-10">
-            <Input
-              id={inputId}
-              type="file"
-              accept=".xlsx,.ods,.csv"
-              className="sr-only"
-              disabled={isParsing}
-              aria-describedby={`${hintId} ${statusId}`}
-              onChange={onFileChange}
-            />
             <ExportButton />
 
             <UploadButton

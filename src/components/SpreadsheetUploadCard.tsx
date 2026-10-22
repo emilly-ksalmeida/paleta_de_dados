@@ -5,8 +5,11 @@ import {
   CircleAlert,
   CircleCheck,
   Download,
+  Info,
   Loader2,
+  TriangleAlert,
   Upload,
+  type LucideIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -39,6 +42,46 @@ const statusToneStyles: Record<StatusTone, string> = {
   warning: "border-warning bg-warning-light text-warning",
   error: "border-destructive bg-destructive-light text-destructive",
 };
+
+const statusToneIcons: Record<StatusTone, LucideIcon> = {
+  default: Info,
+  success: CircleCheck,
+  warning: TriangleAlert,
+  error: CircleAlert,
+};
+
+interface FeedbackMessageProps {
+  tone: StatusTone;
+  message: string;
+  className?: string;
+  role?: "status" | "alert";
+  "aria-live"?: "polite" | "assertive";
+}
+
+function FeedbackMessage({
+  tone,
+  message,
+  className,
+  role,
+  "aria-live": ariaLive,
+}: FeedbackMessageProps) {
+  const Icon = statusToneIcons[tone];
+
+  return (
+    <div
+      role={role}
+      aria-live={ariaLive}
+      className={cn(
+        "flex max-w-sm items-start gap-2 rounded-md border px-3 py-2 text-lg font-bold",
+        statusToneStyles[tone],
+        className,
+      )}
+    >
+      <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+      <span>{message}</span>
+    </div>
+  );
+}
 
 const EXPORT_FEEDBACK_DURATION_MS = 10000;
 const EXPORT_FEEDBACK_EXIT_MS = 250;
@@ -230,19 +273,18 @@ export function SpreadsheetUploadCard({
       </div>
 
       {exportStatus ? (
-        <p
+        <FeedbackMessage
+          tone={exportStatus.tone}
+          message={exportStatus.message}
           role="status"
           aria-live="polite"
           className={cn(
-            "mt-2 max-w-sm rounded-md border px-3 py-2 text-sm",
-            statusToneStyles[exportStatus.tone],
+            "mt-2",
             isExportFeedbackExiting
               ? "motion-safe:animate-feedback-out"
               : "motion-safe:animate-feedback-in",
           )}
-        >
-          {exportStatus.message}
-        </p>
+        />
       ) : null}
 
       <CollapsibleContent className="flex items-center justify-between p-2">
@@ -261,14 +303,7 @@ export function SpreadsheetUploadCard({
             </p>
           ) : null}
           {statusMessage ? (
-            <p
-              className={cn(
-                "max-w-sm rounded-md border px-3 py-2 text-sm",
-                statusToneStyles[statusTone],
-              )}
-            >
-              {statusMessage}
-            </p>
+            <FeedbackMessage tone={statusTone} message={statusMessage} />
           ) : null}
           {lastUploadLabel ? (
             <p className="text-sm text-muted-foreground">

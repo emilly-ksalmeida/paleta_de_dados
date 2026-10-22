@@ -1,4 +1,4 @@
-import { Users } from "lucide-react";
+import { TriangleAlert, Users } from "lucide-react";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDisplayName } from "@/lib/format/displayName";
@@ -17,13 +17,14 @@ interface StudentSearchResultsProps {
 export function StudentSearchResults({
   filteredStudents,
   searchTerm,
-  setSelectedStudent  
+  setSelectedStudent,
 }: StudentSearchResultsProps) {
   const students = filteredStudents ?? [];
   const hasSearched = searchTerm.trim().length > 0;
   const isLoading = filteredStudents === undefined;
   const isEmpty = students.length === 0;
   const hasResults = !isEmpty;
+  const isNotFound = hasSearched && !isLoading && isEmpty;
 
   const statusMessage = !hasSearched
     ? "Pesquise por um nome"
@@ -63,7 +64,7 @@ export function StudentSearchResults({
                 <Button
                   variant="outline"
                   key={`${student.nome_completo}-${student.telefone_para_contato}`}
-                  className="flex flex-col min-h-16 justify-start items-start"
+                  className="flex min-h-16 flex-col items-start justify-start"
                   onClick={() => setSelectedStudent(student)}
                 >
                   <span>{formatDisplayName(student.nome_completo)}</span>
@@ -76,6 +77,17 @@ export function StudentSearchResults({
             })}
           </div>
         </ScrollArea>
+      ) : isNotFound ? (
+        <div className="flex items-start gap-3 rounded-md border border-warning bg-warning-light px-4 py-3 text-lg font-semibold text-warning">
+          <TriangleAlert className="mt-1 size-6 shrink-0" aria-hidden="true" />
+          <span>
+            Nenhum aluno encontrado para{" "}
+            <span className="font-bold underline underline-offset-4">
+              {`"${searchTerm}"`}
+            </span>
+            .
+          </span>
+        </div>
       ) : (
         <p className="p-2 text-sm text-muted-foreground">{statusMessage}</p>
       )}

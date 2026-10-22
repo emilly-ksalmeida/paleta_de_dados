@@ -1,11 +1,14 @@
 import { format } from "date-fns";
 import * as XLSX from "xlsx";
 
+import { downloadBytesAsFile } from "@/lib/download/downloadFile";
 import { listAll } from "@/lib/storage/listAllStudents";
-import { downloadBytesAsFile } from "@/lib/spreadsheet/downloadFile";
 import { FIELD_ALIASES } from "@/lib/spreadsheet/spreadsheet";
 import type { ExportSpreadsheetResult } from "@/types/exportSpreadsheetResult";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
+
+const XLSX_MIME_TYPE =
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
 const EXPORT_SHEET_NAME = "Alunos";
 
@@ -56,7 +59,7 @@ export async function exportStudentsToXlsx(): Promise<ExportSpreadsheetResult> {
     bookType: "xlsx",
   }) as ArrayBuffer;
 
-  downloadBytesAsFile(bytes, fileName);
+  downloadBytesAsFile(bytes, fileName, XLSX_MIME_TYPE);
 
   return {
     success: true,

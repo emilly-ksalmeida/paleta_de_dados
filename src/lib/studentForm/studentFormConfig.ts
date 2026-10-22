@@ -175,3 +175,14 @@ export function getStudentFormDefaults(
     declaracao_ciente: student.declaracao_ciente,
   };
 }
+
+export const REQUIRED_FIELD_NAMES = new Set<keyof StudentFormValues>([
+  "nome_completo",
+  "idade",
+  "data_nascimento",
+  "telefone_para_contato",
+  "telefone_responsavel",
+  "documento_aluno",
+  "documento_responsavel",
+  "comprovante_endereco",
+]);

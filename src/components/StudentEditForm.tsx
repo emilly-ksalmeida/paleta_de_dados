@@ -17,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import {
   getStudentFormDefaults,
+  REQUIRED_FIELD_NAMES,
   STUDENT_FORM_SECTIONS,
 } from "@/lib/studentForm/studentFormConfig";
 import {
@@ -24,17 +25,6 @@ import {
   type StudentFormValues,
 } from "@/schemas/studentFormSchema";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
-
-const REQUIRED_FIELD_NAMES = new Set<keyof StudentFormValues>([
-  "nome_completo",
-  "idade",
-  "data_nascimento",
-  "telefone_para_contato",
-  "telefone_responsavel",
-  "documento_aluno",
-  "documento_responsavel",
-  "comprovante_endereco",
-]);
 
 interface StudentEditFormProps {
   selectedStudent: SpreadsheetStudentType;

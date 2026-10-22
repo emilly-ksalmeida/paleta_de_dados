@@ -1,3 +1,7 @@
+import { useState } from "react";
+import { Pencil } from "lucide-react";
+
+import { StudentEditForm } from "@/components/StudentEditForm";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { InfoRow } from "@/components/ui/InfoRow";
@@ -11,31 +15,57 @@ interface StudentDetailCardProps {
 }
 
 export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
+  const [editingStudent, setEditingStudent] =
+    useState<SpreadsheetStudentType | null>(null);
+  const isEditing =
+    selectedStudent !== null && editingStudent === selectedStudent;
+
   const photoUrl = selectedStudent?.foto_3x4?.trim() ?? "";
   const healthInformationUrl = selectedStudent?.laudo_medico?.trim() ?? "";
   const courseClass = getStudentCourseClass(selectedStudent);
 
   return (
     <Card className="mx-auto max-w-[800px] overflow-hidden">
-      <div className="border-b border-border bg-success-light px-6 py-4">
-        <h2
-          id="dados-heading"
-          className="text-xs font-bold uppercase tracking-widest text-success"
-        >
-          Informações do aluno
-        </h2>
-        {selectedStudent ? (
-          <p className="mt-0.5 text-lg font-bold text-foreground">
-            {formatDisplayName(selectedStudent.nome_completo)}
-          </p>
-        ) : (
-          <p className="mt-0.5 text-lg font-semibold text-muted-foreground">
-            Nenhum aluno selecionado
-          </p>
-        )}
+      <div className="flex items-start justify-between gap-4 border-b border-border bg-success-light px-6 py-4">
+        <div>
+          <h2
+            id="dados-heading"
+            className="text-xs font-bold uppercase tracking-widest text-success"
+          >
+            Informações do aluno
+          </h2>
+          {selectedStudent ? (
+            <p className="mt-0.5 text-lg font-bold text-foreground">
+              {formatDisplayName(selectedStudent.nome_completo)}
+            </p>
+          ) : (
+            <p className="mt-0.5 text-lg font-semibold text-muted-foreground">
+              Nenhum aluno selecionado
+            </p>
+          )}
+        </div>
+        {selectedStudent && !isEditing ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="default"
+            className="shrink-0 text-muted-foreground hover:text-foreground"
+            aria-label="Editar dados do aluno"
+            title="Editar dados do aluno"
+            onClick={() => setEditingStudent(selectedStudent)}
+          >
+            <Pencil aria-hidden="true" />
+            Editar
+          </Button>
+        ) : null}
       </div>
       <div className="px-6 py-5">
-        {!selectedStudent ? (
+        {isEditing && selectedStudent ? (
+          <StudentEditForm
+            selectedStudent={selectedStudent}
+            onCancel={() => setEditingStudent(null)}
+          />
+        ) : !selectedStudent ? (
           <div className="rounded-lg border border-muted bg-muted/50 p-4 text-sm text-muted-foreground">
             Selecione um aluno nos resultados para ver seus dados principais.
           </div>
@@ -105,14 +135,6 @@ export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
                   Visualizar laudo
                 </Button>
               )}
-
-              {/* <Button
-                type="button"
-                className="flex-1 bg-primary text-primary-foreground hover:bg-primary-hover"
-                onClick={onEdit}
-              >
-                Editar
-              </Button> */}
             </div>
           </>
         )}

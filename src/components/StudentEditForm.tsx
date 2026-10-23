@@ -61,7 +61,7 @@ export function StudentEditForm({
 
     try {
       setSubmitError(null);
-      await updateStudent(updatedStudent, selectedStudent.id);
+      await updateStudent(updatedStudent);
       onSaved(updatedStudent);
     } catch {
       setSubmitError("Não foi possível salvar as alterações. Tente novamente.");

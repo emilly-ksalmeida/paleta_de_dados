@@ -165,7 +165,7 @@ export function StudentEditForm({
       </ScrollArea>
 
       {submitError ? (
-        <p role="alert" className="mt-4 text-sm text-destructive">
+        <p role="alert" className="mt-4 text-lg text-destructive">
           {submitError}
         </p>
       ) : null}

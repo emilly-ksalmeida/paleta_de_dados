@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
@@ -15,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import { normalizeKey } from "@/lib/format/normalizeKey";
 import {
   getStudentFormDefaults,
   REQUIRED_FIELD_NAMES,
@@ -24,17 +26,22 @@ import {
   studentFormSchema,
   type StudentFormValues,
 } from "@/schemas/studentFormSchema";
-import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
+import { updateStudent } from "@/lib/storage/updateStudent";
+import type { StudentRecordType } from "@/types/studentRecordType";
 
 interface StudentEditFormProps {
-  selectedStudent: SpreadsheetStudentType;
+  selectedStudent: StudentRecordType;
   onCancel: () => void;
+  onSaved: (student: StudentRecordType) => void;
 }
 
 export function StudentEditForm({
   selectedStudent,
   onCancel,
+  onSaved,
 }: StudentEditFormProps) {
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -45,14 +52,20 @@ export function StudentEditForm({
     defaultValues: getStudentFormDefaults(selectedStudent),
   });
 
-  const submit: SubmitHandler<StudentFormValues> = (data) => {
-    const updatedStudent: SpreadsheetStudentType = {
+  const submit: SubmitHandler<StudentFormValues> = async (data) => {
+    const updatedStudent: StudentRecordType = {
       ...selectedStudent,
       ...data,
+      nome_completo: normalizeKey(data.nome_completo),
     };
 
-    // TODO: persistir no Dexie (db.students.update ou função updateStudent).
-    void updatedStudent;
+    try {
+      setSubmitError(null);
+      await updateStudent(updatedStudent, selectedStudent.id);
+      onSaved(updatedStudent);
+    } catch {
+      setSubmitError("Não foi possível salvar as alterações. Tente novamente.");
+    }
   };
 
   return (
@@ -150,6 +163,12 @@ export function StudentEditForm({
           ))}
         </div>
       </ScrollArea>
+
+      {submitError ? (
+        <p role="alert" className="mt-4 text-sm text-destructive">
+          {submitError}
+        </p>
+      ) : null}
 
       <div className="mt-4 flex justify-end gap-2 border-t border-border pt-4">
         <Button type="button" variant="outline" onClick={onCancel}>

@@ -7,7 +7,8 @@ import { StudentSearchArea } from "./components/StudentSearchArea";
 import { StudentSearchResults } from "./components/StudentSearchResults";
 import { Header } from "./components/Header";
 
-import { normalizeKey, parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
+import { normalizeKey } from "@/lib/format/normalizeKey";
+import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
 import {
   formatUploadTimestamp,
   getLastUploadAt,
@@ -20,8 +21,7 @@ import { hasStudents } from "./lib/storage/hasStudents";
 import { searchStudentsByName } from "./lib/storage/searchStudents";
 
 import type { StatusTone } from "./types/component.types";
-import type { SpreadsheetStudentType } from "./types/spreadsheetStudentType";
-
+import type { StudentRecordType } from "./types/studentRecordType";
 
 export default function App() {
   // estilo
@@ -54,7 +54,7 @@ export default function App() {
   useEffect(() => {
     async function checkStoredStudents() {
       const exists = await hasStudents();
-     
+
       if (exists) {
         setStatusTone("default");
         setStatusMessage("Dados carregados. Busca liberada.");
@@ -150,7 +150,7 @@ export default function App() {
   // AREA DE BUSCA
 
   const [selectedStudent, setSelectedStudent] =
-    useState<SpreadsheetStudentType | null>(null);
+    useState<StudentRecordType | null>(null);
 
   const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -199,7 +199,10 @@ export default function App() {
         </section>
 
         <section aria-labelledby="dados-heading">
-          <StudentDetailCard selectedStudent={selectedStudent} />
+          <StudentDetailCard
+            selectedStudent={selectedStudent}
+            onStudentUpdated={setSelectedStudent}
+          />
         </section>
       </main>
     </div>

@@ -8,15 +8,19 @@ import { InfoRow } from "@/components/ui/InfoRow";
 import { formatBirthDate } from "@/lib/format/birthDate";
 import { formatDisplayName } from "@/lib/format/displayName";
 import getStudentCourseClass from "@/lib/spreadsheet/getStudentCourse";
-import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
+import type { StudentRecordType } from "@/types/studentRecordType";
 
 interface StudentDetailCardProps {
-  selectedStudent: SpreadsheetStudentType | null;
+  selectedStudent: StudentRecordType | null;
+  onStudentUpdated: (student: StudentRecordType) => void;
 }
 
-export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
+export function StudentDetailCard({
+  selectedStudent,
+  onStudentUpdated,
+}: StudentDetailCardProps) {
   const [editingStudent, setEditingStudent] =
-    useState<SpreadsheetStudentType | null>(null);
+    useState<StudentRecordType | null>(null);
   const isEditing =
     selectedStudent !== null && editingStudent === selectedStudent;
 
@@ -64,6 +68,10 @@ export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
           <StudentEditForm
             selectedStudent={selectedStudent}
             onCancel={() => setEditingStudent(null)}
+            onSaved={(student) => {
+              setEditingStudent(null);
+              onStudentUpdated(student);
+            }}
           />
         ) : !selectedStudent ? (
           <div className="rounded-lg border border-muted bg-muted/50 p-4 text-sm text-muted-foreground">

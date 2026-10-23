@@ -3,14 +3,14 @@ import { TriangleAlert, Users } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDisplayName } from "@/lib/format/displayName";
 import getStudentCourseClass from "@/lib/spreadsheet/getStudentCourse";
-import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
+import type { StudentRecordType } from "@/types/studentRecordType";
 import { Button } from "./ui/button";
 
 interface StudentSearchResultsProps {
-  filteredStudents?: SpreadsheetStudentType[];
+  filteredStudents?: StudentRecordType[];
   searchTerm: string;
   setSelectedStudent: React.Dispatch<
-    React.SetStateAction<SpreadsheetStudentType | null>
+    React.SetStateAction<StudentRecordType | null>
   >;
 }
 
@@ -63,7 +63,7 @@ export function StudentSearchResults({
               return (
                 <Button
                   variant="outline"
-                  key={`${student.nome_completo}-${student.telefone_para_contato}`}
+                  key={student.id}
                   className="flex min-h-16 flex-col items-start justify-start"
                   onClick={() => setSelectedStudent(student)}
                 >

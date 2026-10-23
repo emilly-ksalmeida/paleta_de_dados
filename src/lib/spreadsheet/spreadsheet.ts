@@ -1,4 +1,5 @@
 import * as XLSX from "xlsx";
+import { normalizeKey } from "@/lib/format/normalizeKey";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 import type { ParseSpreadsheetResult } from "@/types/parseSpreadsheetResult";
 
@@ -62,15 +63,6 @@ const REQUIRED_COLUMNS = [
   "documento_responsavel",
   "comprovante_endereco",
 ] satisfies (keyof SpreadsheetStudentType)[];
-
-export function normalizeKey(value: string) {
-  return value
-    .normalize("NFD")
-    .replaceAll(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replaceAll(/[^a-z0-9]+/g, "_")
-    .replaceAll(/^_+|_+$/g, "");
-}
 
 function toText(value: unknown): string {
   if (value === null || value === undefined) {

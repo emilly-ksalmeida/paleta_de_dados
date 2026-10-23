@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
 
+import FeedbackMessage from "@/components/FeedbackMessage";
 import { StudentEditForm } from "@/components/StudentEditForm";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,17 +9,46 @@ import { InfoRow } from "@/components/ui/InfoRow";
 import { formatBirthDate } from "@/lib/format/birthDate";
 import { formatDisplayName } from "@/lib/format/displayName";
 import getStudentCourseClass from "@/lib/spreadsheet/getStudentCourse";
-import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
+import type { StudentRecordType } from "@/types/studentRecordType";
 
-interface StudentDetailCardProps {
-  selectedStudent: SpreadsheetStudentType | null;
+const SAVE_FEEDBACK_DURATION_MS = 5000;
+
+interface StudentSaveFeedback {
+  studentId: number;
+  message: string;
 }
 
-export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
+interface StudentDetailCardProps {
+  selectedStudent: StudentRecordType | null;
+  onStudentUpdated: (student: StudentRecordType) => void;
+}
+
+export function StudentDetailCard({
+  selectedStudent,
+  onStudentUpdated,
+}: StudentDetailCardProps) {
   const [editingStudent, setEditingStudent] =
-    useState<SpreadsheetStudentType | null>(null);
+    useState<StudentRecordType | null>(null);
+  const [saveFeedback, setSaveFeedback] =
+    useState<StudentSaveFeedback | null>(null);
   const isEditing =
     selectedStudent !== null && editingStudent === selectedStudent;
+
+  useEffect(() => {
+    if (!saveFeedback) return;
+
+    const timer = window.setTimeout(
+      () => setSaveFeedback(null),
+      SAVE_FEEDBACK_DURATION_MS,
+    );
+
+    return () => window.clearTimeout(timer);
+  }, [saveFeedback]);
+
+  const visibleSaveFeedback =
+    saveFeedback && saveFeedback.studentId === selectedStudent?.id
+      ? saveFeedback.message
+      : null;
 
   const photoUrl = selectedStudent?.foto_3x4?.trim() ?? "";
   const healthInformationUrl = selectedStudent?.laudo_medico?.trim() ?? "";
@@ -52,7 +82,10 @@ export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
             className="shrink-0 text-muted-foreground hover:text-foreground"
             aria-label="Editar dados do aluno"
             title="Editar dados do aluno"
-            onClick={() => setEditingStudent(selectedStudent)}
+            onClick={() => {
+              setSaveFeedback(null);
+              setEditingStudent(selectedStudent);
+            }}
           >
             <Pencil aria-hidden="true" />
             Editar
@@ -60,10 +93,28 @@ export function StudentDetailCard({ selectedStudent }: StudentDetailCardProps) {
         ) : null}
       </div>
       <div className="px-6 py-5">
+        {visibleSaveFeedback ? (
+          <FeedbackMessage
+            tone="success"
+            message={visibleSaveFeedback}
+            role="status"
+            aria-live="polite"
+            className="mb-4"
+          />
+        ) : null}
+
         {isEditing && selectedStudent ? (
           <StudentEditForm
             selectedStudent={selectedStudent}
             onCancel={() => setEditingStudent(null)}
+            onSaved={(student) => {
+              setEditingStudent(null);
+              onStudentUpdated(student);
+              setSaveFeedback({
+                studentId: student.id,
+                message: "Dados do aluno atualizados com sucesso.",
+              });
+            }}
           />
         ) : !selectedStudent ? (
           <div className="rounded-lg border border-muted bg-muted/50 p-4 text-sm text-muted-foreground">

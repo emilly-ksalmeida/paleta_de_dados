@@ -9,13 +9,8 @@ import { Header } from "./components/Header";
 
 import { normalizeKey } from "@/lib/format/normalizeKey";
 import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
-import {
-  formatUploadTimestamp,
-  getLastUploadAt,
-  getLastUploadFileName,
-  setLastUploadAt,
-  setLastUploadFileName,
-} from "@/lib/storage/uploadMetadata";
+import { formatUploadTimestamp } from "@/lib/storage/uploadMetadata";
+import { deriveIsUnexported, getMetadata } from "@/lib/storage/metadata";
 import { addStudents } from "./lib/storage/addStudents";
 import { hasStudents } from "./lib/storage/hasStudents";
 import { searchStudentsByName } from "./lib/storage/searchStudents";
@@ -40,15 +35,10 @@ export default function App() {
   // status do parse da planilha
   const [isParsing, setIsParsing] = useState(false);
 
-  // salvar data e hora do último upload
-  const [persistedUploadAt, setPersistedUploadAt] = useState(
-    () => getLastUploadAt() ?? "",
-  );
-
-  // salvar nome do arquivo do último upload
-  const [persistedUploadFileName, setPersistedUploadFileName] = useState(
-    () => getLastUploadFileName() ?? "",
-  );
+  const metadata = useLiveQuery(() => getMetadata(), []);
+  const persistedUploadAt = metadata?.uploadedAt ?? "";
+  const persistedUploadFileName = metadata?.fileName ?? "";
+  const hasUnexportedChanges = deriveIsUnexported(metadata);
 
   // verifica se tem dados no banco
   useEffect(() => {
@@ -113,13 +103,12 @@ export default function App() {
       const currentUploadAt = new Date().toISOString();
 
       //Adicionando ao banco IndexedDB
-      await addStudents(result.message);
+      await addStudents(result.message, {
+        fileName: file.name,
+        uploadedAt: currentUploadAt,
+      });
 
       setSelectedFileName(file.name);
-      setPersistedUploadAt(currentUploadAt);
-      setLastUploadAt(currentUploadAt);
-      setPersistedUploadFileName(file.name);
-      setLastUploadFileName(file.name);
       setStatusTone("success");
       setStatusMessage(
         `${result.message.length} registro(s) carregado(s) da planilha.`,
@@ -175,6 +164,7 @@ export default function App() {
             statusMessage={statusMessage}
             statusTone={statusTone}
             lastUploadLabel={lastUploadLabel}
+            hasUnexportedChanges={hasUnexportedChanges}
             onFileChange={handleFileChange}
             isOpen={isOpen}
             setIsOpen={setIsOpen}

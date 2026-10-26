@@ -1,6 +1,5 @@
 import { TriangleAlert, Users } from "lucide-react";
 
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDisplayName } from "@/lib/format/displayName";
 import getStudentCourseClass from "@/lib/spreadsheet/getStudentCourse";
 import type { StudentRecordType } from "@/types/studentRecordType";
@@ -55,28 +54,26 @@ export function StudentSearchResults({
       </p>
 
       {hasResults ? (
-        <ScrollArea className="h-52">
-          <div className="flex flex-col gap-4 bg-muted px-10 py-5">
-            {students.map((student) => {
-              const courseClass = getStudentCourseClass(student);
+        <div className="flex flex-col gap-4 bg-muted px-10 py-5">
+          {students.map((student) => {
+            const courseClass = getStudentCourseClass(student);
 
-              return (
-                <Button
-                  variant="outline"
-                  key={student.id}
-                  className="flex min-h-16 flex-col items-start justify-start"
-                  onClick={() => setSelectedStudent(student)}
-                >
-                  <span>{formatDisplayName(student.nome_completo)}</span>
-                  <span className="text-xs">
-                    {courseClass.studentCourse || "—"} —{" "}
-                    {courseClass.studentClass || "—"}
-                  </span>
-                </Button>
-              );
-            })}
-          </div>
-        </ScrollArea>
+            return (
+              <Button
+                variant="outline"
+                key={student.id}
+                className="flex min-h-16 flex-col items-start justify-start"
+                onClick={() => setSelectedStudent(student)}
+              >
+                <span>{formatDisplayName(student.nome_completo)}</span>
+                <span className="text-xs">
+                  {courseClass.studentCourse || "—"} —{" "}
+                  {courseClass.studentClass || "—"}
+                </span>
+              </Button>
+            );
+          })}
+        </div>
       ) : isNotFound ? (
         <div className="flex items-start gap-3 rounded-md border border-warning bg-warning-light px-4 py-3 text-lg font-semibold text-warning">
           <TriangleAlert className="mt-1 size-6 shrink-0" aria-hidden="true" />

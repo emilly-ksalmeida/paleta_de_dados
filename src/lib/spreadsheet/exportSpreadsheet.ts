@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 
 import { downloadBytesAsFile } from "@/lib/download/downloadFile";
 import { listAll } from "@/lib/storage/listAllStudents";
+import { markAsExported } from "@/lib/storage/markAsExported";
 import { FIELD_ALIASES } from "@/lib/spreadsheet/spreadsheet";
 import type { ExportSpreadsheetResult } from "@/types/exportSpreadsheetResult";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
@@ -60,6 +61,8 @@ export async function exportStudentsToXlsx(): Promise<ExportSpreadsheetResult> {
   }) as ArrayBuffer;
 
   downloadBytesAsFile(bytes, fileName, XLSX_MIME_TYPE);
+
+  await markAsExported();
 
   return {
     success: true,

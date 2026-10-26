@@ -10,7 +10,7 @@ import { Header } from "./components/Header";
 import { normalizeKey } from "@/lib/format/normalizeKey";
 import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
 import { formatUploadTimestamp } from "@/lib/storage/uploadMetadata";
-import { getMetadata } from "@/lib/storage/metadata";
+import { deriveIsUnexported, getMetadata } from "@/lib/storage/metadata";
 import { addStudents } from "./lib/storage/addStudents";
 import { hasStudents } from "./lib/storage/hasStudents";
 import { searchStudentsByName } from "./lib/storage/searchStudents";
@@ -38,6 +38,7 @@ export default function App() {
   const metadata = useLiveQuery(() => getMetadata(), []);
   const persistedUploadAt = metadata?.uploadedAt ?? "";
   const persistedUploadFileName = metadata?.fileName ?? "";
+  const hasUnexportedChanges = deriveIsUnexported(metadata);
 
   // verifica se tem dados no banco
   useEffect(() => {
@@ -163,6 +164,7 @@ export default function App() {
             statusMessage={statusMessage}
             statusTone={statusTone}
             lastUploadLabel={lastUploadLabel}
+            hasUnexportedChanges={hasUnexportedChanges}
             onFileChange={handleFileChange}
             isOpen={isOpen}
             setIsOpen={setIsOpen}

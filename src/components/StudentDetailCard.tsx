@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pencil } from "lucide-react";
 
 import FeedbackMessage from "@/components/FeedbackMessage";
@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { InfoRow } from "@/components/ui/InfoRow";
 import { formatBirthDate } from "@/lib/format/birthDate";
 import { formatDisplayName } from "@/lib/format/displayName";
+import { scrollToElement } from "@/lib/scroll/scrollToElement";
 import getStudentCourseClass from "@/lib/spreadsheet/getStudentCourse";
 import type { StudentRecordType } from "@/types/studentRecordType";
 
@@ -31,8 +32,15 @@ export function StudentDetailCard({
     useState<StudentRecordType | null>(null);
   const [saveFeedback, setSaveFeedback] =
     useState<StudentSaveFeedback | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const isEditing =
     selectedStudent !== null && editingStudent === selectedStudent;
+
+  useEffect(() => {
+    if (!saveFeedback) return;
+
+    scrollToElement(cardRef.current);
+  }, [saveFeedback]);
 
   useEffect(() => {
     if (!saveFeedback) return;
@@ -55,7 +63,10 @@ export function StudentDetailCard({
   const courseClass = getStudentCourseClass(selectedStudent);
 
   return (
-    <Card className="mx-auto max-w-[800px] overflow-hidden">
+    <Card
+      ref={cardRef}
+      className="mx-auto max-w-[800px] scroll-mt-4 overflow-hidden"
+    >
       <div className="flex items-start justify-between gap-4 border-b border-border bg-success-light px-6 py-4">
         <div>
           <h2

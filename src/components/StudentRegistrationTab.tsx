@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import FeedbackMessage from "@/components/FeedbackMessage";
 import { StudentCreateForm } from "@/components/StudentCreateForm";
 import { formatDisplayName } from "@/lib/format/displayName";
 import { normalizeKey } from "@/lib/format/normalizeKey";
+import { scrollToElement } from "@/lib/scroll/scrollToElement";
 import { addStudent } from "@/lib/storage/addStudent";
 import { getMetadata } from "@/lib/storage/metadata";
 import type { StudentFormValues } from "@/schemas/studentFormSchema";
@@ -16,6 +17,15 @@ interface RegistrationFeedback {
 
 export function StudentRegistrationTab() {
   const [feedback, setFeedback] = useState<RegistrationFeedback | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (feedback?.tone !== "success") {
+      return;
+    }
+
+    scrollToElement(panelRef.current);
+  }, [feedback]);
 
   async function createStudent(data: StudentFormValues): Promise<boolean> {
     setFeedback(null);
@@ -52,7 +62,7 @@ export function StudentRegistrationTab() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={panelRef} className="scroll-mt-4 flex flex-col gap-4">
       {feedback ? (
         <FeedbackMessage
           tone={feedback.tone}

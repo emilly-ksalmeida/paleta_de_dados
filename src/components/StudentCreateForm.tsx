@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Loader2 } from "lucide-react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { StudentFormFields } from "@/components/StudentFormFields";
 import { Button } from "@/components/ui/button";
@@ -9,23 +10,36 @@ import {
   type StudentFormValues,
 } from "@/schemas/studentFormSchema";
 
-export function StudentCreateForm() {
+interface StudentCreateFormProps {
+  onSubmit: (values: StudentFormValues) => Promise<boolean>;
+}
+
+export function StudentCreateForm({ onSubmit }: StudentCreateFormProps) {
   const {
     register,
     reset,
-    formState: { errors },
+    handleSubmit,
+    formState: { errors, isSubmitting },
   } = useForm<StudentFormValues>({
     resolver: zodResolver(studentFormSchema),
     mode: "onSubmit",
     defaultValues: getEmptyStudentFormDefaults(),
   });
 
+  const submit: SubmitHandler<StudentFormValues> = async (data) => {
+    const didCreate = await onSubmit(data);
+
+    if (didCreate) {
+      reset();
+    }
+  };
+
   return (
     <form
       className="flex flex-col"
       aria-label="Formulário de cadastro de aluno"
       onSubmit={(event) => {
-        event.preventDefault();
+        void handleSubmit(submit)(event);
       }}
     >
       <p aria-hidden="true" className="mb-2 text-sm text-muted-foreground">
@@ -39,16 +53,23 @@ export function StudentCreateForm() {
       />
 
       <div className="mt-4 flex justify-end gap-2 border-t border-border pt-4">
-        <Button type="button" variant="outline" onClick={() => reset()}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => reset()}
+          disabled={isSubmitting}
+        >
           Limpar
         </Button>
         <Button
           type="submit"
-          disabled
-          title="Disponível após a integração com o banco de dados."
+          disabled={isSubmitting}
           className="bg-primary text-primary-foreground hover:bg-primary-hover"
         >
-          Cadastrar
+          {isSubmitting ? (
+            <Loader2 className="animate-spin" aria-hidden="true" />
+          ) : null}
+          {isSubmitting ? "Cadastrando..." : "Cadastrar"}
         </Button>
       </div>
     </form>

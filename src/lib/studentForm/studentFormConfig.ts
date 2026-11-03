@@ -1,6 +1,13 @@
 import { formatBirthDate } from "@/lib/format/birthDate";
 import { formatDisplayName } from "@/lib/format/displayName";
 import {
+  AUTORIZACAO_USO_IMAGEM_OPTIONS,
+  AUTORIZACAO_USO_IMAGEM_TEXT,
+  DECLARACAO_CIENTE_OPTIONS,
+  DECLARACAO_CIENTE_TEXT,
+  type RadioOption,
+} from "@/lib/studentForm/authorizationConfig";
+import {
   studentFormSchema,
   type StudentFormValues,
 } from "@/schemas/studentFormSchema";
@@ -14,6 +21,7 @@ interface StudentFieldConfig {
   description?: string;
   placeholder?: string;
   multiline?: boolean;
+  radioOptions?: RadioOption[];
 }
 
 interface StudentFormSection {
@@ -130,12 +138,14 @@ export const STUDENT_FORM_SECTIONS: StudentFormSection[] = [
       {
         name: "autorizacao_uso_imagem",
         label: "Autorização de uso de imagem",
-        multiline: true,
+        description: AUTORIZACAO_USO_IMAGEM_TEXT,
+        radioOptions: AUTORIZACAO_USO_IMAGEM_OPTIONS,
       },
       {
         name: "declaracao_ciente",
         label: "Declaração de ciência",
-        multiline: true,
+        description: DECLARACAO_CIENTE_TEXT,
+        radioOptions: DECLARACAO_CIENTE_OPTIONS,
       },
     ],
   },

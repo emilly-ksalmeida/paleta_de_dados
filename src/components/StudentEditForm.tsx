@@ -28,6 +28,7 @@ export function StudentEditForm({
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<StudentFormValues>({
@@ -65,6 +66,7 @@ export function StudentEditForm({
       </p>
       <StudentFormFields
         register={register}
+        control={control}
         errors={errors}
         idPrefix="student"
       />

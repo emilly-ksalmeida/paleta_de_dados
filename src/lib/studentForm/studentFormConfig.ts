@@ -1,6 +1,9 @@
 import { formatBirthDate } from "@/lib/format/birthDate";
 import { formatDisplayName } from "@/lib/format/displayName";
-import type { StudentFormValues } from "@/schemas/studentFormSchema";
+import {
+  studentFormSchema,
+  type StudentFormValues,
+} from "@/schemas/studentFormSchema";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 
 type StudentFieldName = keyof StudentFormValues;
@@ -137,6 +140,12 @@ export const STUDENT_FORM_SECTIONS: StudentFormSection[] = [
     ],
   },
 ];
+
+export function getEmptyStudentFormDefaults(): StudentFormValues {
+  return Object.fromEntries(
+    Object.keys(studentFormSchema.shape).map((fieldName) => [fieldName, ""]),
+  ) as StudentFormValues;
+}
 
 export function getStudentFormDefaults(
   student: SpreadsheetStudentType,

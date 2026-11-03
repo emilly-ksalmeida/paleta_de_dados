@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import { Search, UserPlus } from "lucide-react";
 
+import { StudentCreateForm } from "@/components/StudentCreateForm";
 import { StudentSearchTab } from "@/components/StudentSearchTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { StudentRecordType } from "@/types/studentRecordType";
@@ -52,7 +53,7 @@ export default function StudentManagementTabs({
           />
         </TabsContent>
         <TabsContent value="register-student">
-          {/* componente de cadastro aqui */}
+          <StudentCreateForm />
         </TabsContent>
       </Tabs>
     </div>

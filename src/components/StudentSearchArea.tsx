@@ -48,6 +48,8 @@ export function StudentSearchArea({ setSearchTerm, statusMessage, setIsOpen }: S
       </p>
 
       <form
+        role="search"
+        aria-label="Buscar aluno"
         onSubmit={(e) => {
           void handleSubmit(search)(e);
         }}
@@ -57,6 +59,7 @@ export function StudentSearchArea({ setSearchTerm, statusMessage, setIsOpen }: S
           <div className="flex-1 space-y-1">
             <Input
               id="student-search"
+              aria-label="Nome do aluno"
               placeholder={statusMessage}
               aria-invalid={errors.searchTerm ? true : undefined}
               aria-describedby={errors.searchTerm ? errorId : undefined}

@@ -26,7 +26,7 @@ export default function StudentManagementTabs({
   return (
     <div className="flex flex-col gap-4">
       <Tabs defaultValue="search-student">
-        <TabsList className="h-auto">
+        <TabsList className="h-auto" aria-label="Gerenciamento de alunos">
           <TabsTrigger
             value="search-student"
             className="gap-2 px-4 py-2 text-lg font-bold"

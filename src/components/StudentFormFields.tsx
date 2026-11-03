@@ -39,7 +39,7 @@ export function StudentFormFields({
             {section.description ? (
               <FieldDescription>{section.description}</FieldDescription>
             ) : null}
-            <FieldGroup className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FieldGroup className="flex flex-wrap gap-4">
               {section.fields.map((field) => {
                 const fieldError = errors[field.name];
                 const fieldId = `${idPrefix}-${field.name}`;
@@ -56,7 +56,11 @@ export function StudentFormFields({
                   <Field
                     key={field.name}
                     data-invalid={fieldError ? true : undefined}
-                    className={field.multiline ? "md:col-span-2" : undefined}
+                    className={
+                      field.multiline
+                        ? "w-full"
+                        : "w-full md:w-[calc(50%-0.5rem)]"
+                    }
                   >
                     <FieldLabel htmlFor={fieldId}>
                       {field.label}

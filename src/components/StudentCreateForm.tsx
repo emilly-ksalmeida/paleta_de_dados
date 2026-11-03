@@ -38,6 +38,7 @@ export function StudentCreateForm({ onSubmit }: StudentCreateFormProps) {
     <form
       className="flex flex-col"
       aria-label="Formulário de cadastro de aluno"
+      aria-busy={isSubmitting}
       onSubmit={(event) => {
         void handleSubmit(submit)(event);
       }}

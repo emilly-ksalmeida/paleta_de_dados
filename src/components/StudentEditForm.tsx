@@ -4,7 +4,6 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { StudentFormFields } from "@/components/StudentFormFields";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { normalizeKey } from "@/lib/format/normalizeKey";
 import { getStudentFormDefaults } from "@/lib/studentForm/studentFormConfig";
 import {
@@ -64,17 +63,11 @@ export function StudentEditForm({
       <p aria-hidden="true" className="mb-2 text-sm text-muted-foreground">
         Campos com <span className="text-destructive">*</span> são obrigatórios.
       </p>
-      <ScrollArea
-        className="h-[360px] pr-4"
-        role="region"
-        aria-label="Campos do formulário de aluno"
-      >
-        <StudentFormFields
-          register={register}
-          errors={errors}
-          idPrefix="student"
-        />
-      </ScrollArea>
+      <StudentFormFields
+        register={register}
+        errors={errors}
+        idPrefix="student"
+      />
 
       {submitError ? (
         <p role="alert" className="mt-4 text-lg text-destructive">

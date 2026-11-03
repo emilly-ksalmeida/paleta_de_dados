@@ -67,11 +67,11 @@ export function StudentDetailCard({
       ref={cardRef}
       className="mx-auto max-w-[800px] scroll-mt-4 overflow-hidden"
     >
-      <div className="flex items-start justify-between gap-4 border-b border-border bg-success-light px-6 py-4">
+      <div className="flex items-start justify-between gap-4 border-b border-border bg-primary/10 px-6 py-4">
         <div>
           <h2
             id="dados-heading"
-            className="text-xs font-bold uppercase tracking-widest text-success"
+            className="text-xs font-bold uppercase tracking-widest text-brand-header"
           >
             Informações do aluno
           </h2>

@@ -3,7 +3,7 @@ import paletteIcon from "@/assets/icons/art-palette-svgrepo-com.svg";
 export function Header() {
   return (
     <header className="flex flex-row items-center justify-start gap-6 bg-brand-header px-28 py-4">
-      <div className="bg-primary p-1 rounded-md">
+      <div className="bg-[#FFEAC8] p-1 rounded-md">
         <img
           src={paletteIcon}
           alt="Paleta de Dados"

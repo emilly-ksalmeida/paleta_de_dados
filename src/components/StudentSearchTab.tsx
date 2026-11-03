@@ -10,6 +10,7 @@ interface StudentSearchTabProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   filteredStudents?: StudentRecordType[];
   searchTerm: string;
+  selectedStudent: StudentRecordType | null;
   setSelectedStudent: Dispatch<SetStateAction<StudentRecordType | null>>;
 }
 
@@ -19,6 +20,7 @@ export function StudentSearchTab({
   setIsOpen,
   filteredStudents,
   searchTerm,
+  selectedStudent,
   setSelectedStudent,
 }: StudentSearchTabProps) {
   return (
@@ -32,6 +34,7 @@ export function StudentSearchTab({
       <StudentSearchResults
         filteredStudents={filteredStudents}
         searchTerm={searchTerm}
+        selectedStudent={selectedStudent}
         setSelectedStudent={setSelectedStudent}
       />
     </div>

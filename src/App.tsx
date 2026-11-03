@@ -180,6 +180,7 @@ export default function App() {
             setIsOpen={setIsOpen}
             filteredStudents={filteredStudents}
             searchTerm={searchTerm}
+            selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
           />
         </section>

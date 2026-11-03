@@ -3,8 +3,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 
 import { SpreadsheetUploadCard } from "./components/SpreadsheetUploadCard";
 import { StudentDetailCard } from "./components/StudentDetailCard";
-import { StudentSearchArea } from "./components/StudentSearchArea";
-import { StudentSearchResults } from "./components/StudentSearchResults";
+import StudentManagementTabs from "./components/StudentManagementTabs";
 import { Header } from "./components/Header";
 
 import { normalizeKey } from "@/lib/format/normalizeKey";
@@ -172,16 +171,13 @@ export default function App() {
         </section>
 
         <section
-          aria-labelledby="busca-heading"
+          aria-label="Gerenciamento de alunos"
           className="flex flex-col gap-5 rounded-xl border bg-card p-8 shadow"
         >
-          <StudentSearchArea
+          <StudentManagementTabs
             setSearchTerm={setSearchTerm}
             statusMessage={statusMessage}
             setIsOpen={setIsOpen}
-          />
-
-          <StudentSearchResults
             filteredStudents={filteredStudents}
             searchTerm={searchTerm}
             setSelectedStudent={setSelectedStudent}

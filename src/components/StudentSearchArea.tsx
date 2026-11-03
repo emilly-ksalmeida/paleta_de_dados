@@ -43,17 +43,9 @@ export function StudentSearchArea({ setSearchTerm, statusMessage, setIsOpen }: S
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="space-y-1.5">
-        <h2
-          id="busca-heading"
-          className="font-semibold leading-none tracking-tight"
-        >
-          Buscar aluno
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Digite o nome para localizar o aluno na planilha carregada.
-        </p>
-      </div>
+      <p className="text-sm text-muted-foreground">
+        Digite o nome para localizar o aluno na planilha carregada.
+      </p>
 
       <form
         onSubmit={(e) => {

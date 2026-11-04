@@ -17,6 +17,7 @@ interface StudentCreateFormProps {
 export function StudentCreateForm({ onSubmit }: StudentCreateFormProps) {
   const {
     register,
+    control,
     reset,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -49,6 +50,7 @@ export function StudentCreateForm({ onSubmit }: StudentCreateFormProps) {
 
       <StudentFormFields
         register={register}
+        control={control}
         errors={errors}
         idPrefix="student-create"
       />

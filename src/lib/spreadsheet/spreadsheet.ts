@@ -1,5 +1,9 @@
 import * as XLSX from "xlsx";
 import { normalizeKey } from "@/lib/format/normalizeKey";
+import {
+  AUTORIZACAO_USO_IMAGEM_TEXT,
+  DECLARACAO_CIENTE_TEXT,
+} from "@/lib/studentForm/authorizationConfig";
 import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
 import type { ParseSpreadsheetResult } from "@/types/parseSpreadsheetResult";
 
@@ -45,12 +49,8 @@ export const FIELD_ALIASES: Record<keyof SpreadsheetStudentType, string[]> = {
     "observações medicas",
     "Informações pertinentes à saúde do(a) aluno(a)   (Alergias, TDAH, condições médicas relevantes, uso contínuo de medicação, entre outros) Tipo: Parágrafo Observação: As informações serão utilizadas exclusivamente para fins de acompanhamento e segurança do aluno, em conformidade com a legislação vigente.",
   ],
-  autorizacao_uso_imagem: [
-    "Autorizo, de forma gratuita, a Secretaria Municipal de Cultura e Turismo da Prefeitura Municipal de Anápolis a utilizar a imagem, captadas durante atividades pedagógicas, eventos, apresentações, exposições e ações institucionais da Escola de Artes de Anápolis Oswaldo Verano, para fins exclusivamente educativos, culturais e institucionais, incluindo divulgação em materiais impressos, audiovisuais, site oficial e redes sociais institucionais, sem qualquer ônus ou prazo determinado.\t",
-  ],
-  declaracao_ciente: [
-    "Declaro que li e estou ciente das condições estabelecidas pela Secretaria Municipal de Cultura e Turismo da Prefeitura Municipal de Anápolis para participação na Escola de Artes de Anápolis Oswaldo Verano, responsabilizando-me pela veracidade das informações prestadas.",
-  ],
+  autorizacao_uso_imagem: [AUTORIZACAO_USO_IMAGEM_TEXT],
+  declaracao_ciente: [DECLARACAO_CIENTE_TEXT],
 };
 
 const REQUIRED_COLUMNS = [

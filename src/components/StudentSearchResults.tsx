@@ -2,12 +2,14 @@ import { TriangleAlert, Users } from "lucide-react";
 
 import { formatDisplayName } from "@/lib/format/displayName";
 import getStudentCourseClass from "@/lib/spreadsheet/getStudentCourse";
+import { cn } from "@/lib/utils";
 import type { StudentRecordType } from "@/types/studentRecordType";
 import { Button } from "./ui/button";
 
 interface StudentSearchResultsProps {
   filteredStudents?: StudentRecordType[];
   searchTerm: string;
+  selectedStudent: StudentRecordType | null;
   setSelectedStudent: React.Dispatch<
     React.SetStateAction<StudentRecordType | null>
   >;
@@ -16,6 +18,7 @@ interface StudentSearchResultsProps {
 export function StudentSearchResults({
   filteredStudents,
   searchTerm,
+  selectedStudent,
   setSelectedStudent,
 }: StudentSearchResultsProps) {
   const students = filteredStudents ?? [];
@@ -57,12 +60,18 @@ export function StudentSearchResults({
         <div className="flex flex-col gap-4 bg-muted px-10 py-5">
           {students.map((student) => {
             const courseClass = getStudentCourseClass(student);
+            const isSelected = selectedStudent?.id === student.id;
 
             return (
               <Button
                 variant="outline"
                 key={student.id}
-                className="flex min-h-16 flex-col items-start justify-start"
+                aria-pressed={isSelected}
+                className={cn(
+                  "flex min-h-16 flex-col items-start justify-start",
+                  isSelected &&
+                    "border-primary/30 bg-primary/10 text-brand-header hover:bg-primary/15 hover:text-brand-header",
+                )}
                 onClick={() => setSelectedStudent(student)}
               >
                 <span>{formatDisplayName(student.nome_completo)}</span>

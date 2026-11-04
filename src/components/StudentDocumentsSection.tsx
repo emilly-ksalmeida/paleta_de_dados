@@ -48,6 +48,18 @@ export function StudentDocumentsSection({
   const documents: StudentDocumentItem[] = [
     { label: "Visualizar foto", url: student.foto_3x4?.trim() ?? "" },
     { label: "Visualizar laudo", url: student.laudo_medico?.trim() ?? "" },
+    {
+      label: "Documento do aluno",
+      url: student.documento_aluno?.trim() ?? "",
+    },
+    {
+      label: "Comprovante de endereço",
+      url: student.comprovante_endereco?.trim() ?? "",
+    },
+    {
+      label: "Documento dos responsáveis",
+      url: student.documento_responsavel?.trim() ?? "",
+    },
   ];
 
   const availableCount = documents.filter(({ url }) => url).length;

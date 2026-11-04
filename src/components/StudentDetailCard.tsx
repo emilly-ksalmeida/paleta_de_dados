@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Pencil } from "lucide-react";
 
 import FeedbackMessage from "@/components/FeedbackMessage";
+import { StudentDocumentsSection } from "@/components/StudentDocumentsSection";
 import { StudentEditForm } from "@/components/StudentEditForm";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -58,8 +59,6 @@ export function StudentDetailCard({
       ? saveFeedback.message
       : null;
 
-  const photoUrl = selectedStudent?.foto_3x4?.trim() ?? "";
-  const healthInformationUrl = selectedStudent?.laudo_medico?.trim() ?? "";
   const courseClass = getStudentCourseClass(selectedStudent);
 
   return (
@@ -159,45 +158,7 @@ export function StudentDetailCard({
                 value={(selectedStudent.informacoes_saude ?? "").trim()}
               />
             </dl>
-            <div className="mt-5 flex gap-2 border-t border-border pt-4">
-              {photoUrl ? (
-                <Button asChild variant="outline" className="flex-1">
-                  <a href={photoUrl} target="_blank" rel="noopener noreferrer">
-                    Visualizar foto
-                  </a>
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  disabled
-                >
-                  Visualizar foto
-                </Button>
-              )}
-
-              {healthInformationUrl ? (
-                <Button asChild variant="outline" className="flex-1">
-                  <a
-                    href={healthInformationUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Visualizar laudo
-                  </a>
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  disabled
-                >
-                  Visualizar laudo
-                </Button>
-              )}
-            </div>
+            <StudentDocumentsSection student={selectedStudent} />
           </>
         )}
       </div>

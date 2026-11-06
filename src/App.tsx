@@ -3,25 +3,19 @@ import { useLiveQuery } from "dexie-react-hooks";
 
 import { SpreadsheetUploadCard } from "./components/SpreadsheetUploadCard";
 import { StudentDetailCard } from "./components/StudentDetailCard";
-import { StudentSearchArea } from "./components/StudentSearchArea";
-import { StudentSearchResults } from "./components/StudentSearchResults";
+import StudentManagementTabs from "./components/StudentManagementTabs";
 import { Header } from "./components/Header";
 
-import { normalizeKey, parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
-import {
-  formatUploadTimestamp,
-  getLastUploadAt,
-  getLastUploadFileName,
-  setLastUploadAt,
-  setLastUploadFileName,
-} from "@/lib/storage/uploadMetadata";
+import { normalizeKey } from "@/lib/format/normalizeKey";
+import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
+import { formatUploadTimestamp } from "@/lib/storage/uploadMetadata";
+import { deriveIsUnexported, getMetadata } from "@/lib/storage/metadata";
 import { addStudents } from "./lib/storage/addStudents";
 import { hasStudents } from "./lib/storage/hasStudents";
 import { searchStudentsByName } from "./lib/storage/searchStudents";
 
 import type { StatusTone } from "./types/component.types";
-import type { SpreadsheetStudentType } from "./types/spreadsheetStudentType";
-
+import type { StudentRecordType } from "./types/studentRecordType";
 
 export default function App() {
   // estilo
@@ -40,21 +34,16 @@ export default function App() {
   // status do parse da planilha
   const [isParsing, setIsParsing] = useState(false);
 
-  // salvar data e hora do último upload
-  const [persistedUploadAt, setPersistedUploadAt] = useState(
-    () => getLastUploadAt() ?? "",
-  );
-
-  // salvar nome do arquivo do último upload
-  const [persistedUploadFileName, setPersistedUploadFileName] = useState(
-    () => getLastUploadFileName() ?? "",
-  );
+  const metadata = useLiveQuery(() => getMetadata(), []);
+  const persistedUploadAt = metadata?.uploadedAt ?? "";
+  const persistedUploadFileName = metadata?.fileName ?? "";
+  const hasUnexportedChanges = deriveIsUnexported(metadata);
 
   // verifica se tem dados no banco
   useEffect(() => {
     async function checkStoredStudents() {
       const exists = await hasStudents();
-     
+
       if (exists) {
         setStatusTone("default");
         setStatusMessage("Dados carregados. Busca liberada.");
@@ -113,13 +102,12 @@ export default function App() {
       const currentUploadAt = new Date().toISOString();
 
       //Adicionando ao banco IndexedDB
-      await addStudents(result.message);
+      await addStudents(result.message, {
+        fileName: file.name,
+        uploadedAt: currentUploadAt,
+      });
 
       setSelectedFileName(file.name);
-      setPersistedUploadAt(currentUploadAt);
-      setLastUploadAt(currentUploadAt);
-      setPersistedUploadFileName(file.name);
-      setLastUploadFileName(file.name);
       setStatusTone("success");
       setStatusMessage(
         `${result.message.length} registro(s) carregado(s) da planilha.`,
@@ -150,7 +138,7 @@ export default function App() {
   // AREA DE BUSCA
 
   const [selectedStudent, setSelectedStudent] =
-    useState<SpreadsheetStudentType | null>(null);
+    useState<StudentRecordType | null>(null);
 
   const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -175,6 +163,7 @@ export default function App() {
             statusMessage={statusMessage}
             statusTone={statusTone}
             lastUploadLabel={lastUploadLabel}
+            hasUnexportedChanges={hasUnexportedChanges}
             onFileChange={handleFileChange}
             isOpen={isOpen}
             setIsOpen={setIsOpen}
@@ -182,24 +171,25 @@ export default function App() {
         </section>
 
         <section
-          aria-labelledby="busca-heading"
+          aria-label="Gerenciamento de alunos"
           className="flex flex-col gap-5 rounded-xl border bg-card p-8 shadow"
         >
-          <StudentSearchArea
+          <StudentManagementTabs
             setSearchTerm={setSearchTerm}
             statusMessage={statusMessage}
             setIsOpen={setIsOpen}
-          />
-
-          <StudentSearchResults
             filteredStudents={filteredStudents}
             searchTerm={searchTerm}
+            selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
           />
         </section>
 
         <section aria-labelledby="dados-heading">
-          <StudentDetailCard selectedStudent={selectedStudent} />
+          <StudentDetailCard
+            selectedStudent={selectedStudent}
+            onStudentUpdated={setSelectedStudent}
+          />
         </section>
       </main>
     </div>

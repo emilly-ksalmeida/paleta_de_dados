@@ -1,6 +1,8 @@
 import { db } from "@/lib/storage/db";
-import type { SpreadsheetStudentType } from "@/types/spreadsheetStudentType";
+import type { StudentRecordType } from "@/types/studentRecordType";
 
-export async function searchStudentsByName(name: string): Promise<SpreadsheetStudentType[]> {
- return await db.students.where("nome_completo").startsWith(name).toArray();
+export async function searchStudentsByName(
+  name: string,
+): Promise<StudentRecordType[]> {
+  return await db.students.where("nome_completo").startsWith(name).toArray();
 }

@@ -1,6 +1,6 @@
 import { useId, type ChangeEvent } from "react";
 
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { StatusTone } from "@/types/component.types";
 import {
@@ -18,6 +18,7 @@ interface SpreadsheetUploadCardProps {
   statusMessage?: string;
   statusTone?: StatusTone;
   lastUploadLabel?: string;
+  hasUnexportedChanges?: boolean;
   onFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -29,6 +30,7 @@ export function SpreadsheetUploadCard({
   statusMessage,
   statusTone = "default",
   lastUploadLabel,
+  hasUnexportedChanges = false,
   onFileChange,
   isOpen,
   setIsOpen,
@@ -39,14 +41,25 @@ export function SpreadsheetUploadCard({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div className="flex items-center justify-between">
-        <div className="flex w-full flex-row items-center justify-between">
+        <div className="flex w-full flex-row flex-wrap items-center justify-between gap-3">
           <h2
             id="upload-heading"
             className="font-semibold leading-none tracking-tight"
           >
             Carregar Planilha
           </h2>
-          <div className="flex items-center gap-10">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-6">
+            {hasUnexportedChanges ? (
+              <div
+                role="status"
+                aria-live="polite"
+                className="inline-flex items-center gap-2 rounded-full border border-warning bg-warning-light px-4 py-2 text-sm font-semibold text-warning"
+              >
+                <TriangleAlert className="size-5 shrink-0" aria-hidden="true" />
+                <span>Planilha não exportada</span>
+              </div>
+            ) : null}
+
             <ExportButton />
 
             <UploadButton

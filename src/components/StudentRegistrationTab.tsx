@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { formatDisplayName } from "@/lib/format/displayName";
 import { normalizeKey } from "@/lib/format/normalizeKey";
 import { scrollToElement } from "@/lib/scroll/scrollToElement";
+import getStudentCourseClass from "@/lib/spreadsheet/getStudentCourse";
 import { addStudent } from "@/lib/storage/addStudent";
 import { findStudentsByExactFullName } from "@/lib/storage/findStudentsByExactFullName";
 import { getMetadata } from "@/lib/storage/metadata";
@@ -154,16 +155,24 @@ export function StudentRegistrationTab() {
           </AlertDialogHeader>
 
           <div className="flex max-h-60 flex-col gap-2 overflow-y-auto">
-            {duplicateStudents.map((student, index) => (
-              <div
-                key={student.id ?? `${student.nome_completo}-${index}`}
-                className="rounded-md border p-3 text-sm"
-              >
-                <p className="font-bold">
-                  {formatDisplayName(student.nome_completo)}
-                </p>
-              </div>
-            ))}
+            {duplicateStudents.map((student, index) => {
+              const { studentCourse, studentClass } =
+                getStudentCourseClass(student);
+
+              return (
+                <div
+                  key={student.id ?? `${student.nome_completo}-${index}`}
+                  className="rounded-md border p-3 text-sm"
+                >
+                  <p className="font-bold">
+                    {formatDisplayName(student.nome_completo)}
+                  </p>
+                  <p>Idade: {student.idade?.trim() || "-"}</p>
+                  <p>Curso: {studentCourse || "-"}</p>
+                  <p>Turma: {studentClass || "-"}</p>
+                </div>
+              );
+            })}
           </div>
 
           <AlertDialogFooter>

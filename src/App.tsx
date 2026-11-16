@@ -6,6 +6,7 @@ import { StudentDetailCard } from "./components/StudentDetailCard";
 import StudentManagementTabs from "./components/StudentManagementTabs";
 import { Header } from "./components/Header";
 
+import { useBeforeUnloadWarning } from "@/hooks/useBeforeUnloadWarning";
 import { normalizeKey } from "@/lib/format/normalizeKey";
 import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
 import { formatUploadTimestamp } from "@/lib/storage/uploadMetadata";
@@ -38,6 +39,7 @@ export default function App() {
   const persistedUploadAt = metadata?.uploadedAt ?? "";
   const persistedUploadFileName = metadata?.fileName ?? "";
   const hasUnexportedChanges = deriveIsUnexported(metadata);
+  useBeforeUnloadWarning(hasUnexportedChanges);
 
   // verifica se tem dados no banco
   useEffect(() => {

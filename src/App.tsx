@@ -6,10 +6,11 @@ import { StudentDetailCard } from "./components/StudentDetailCard";
 import StudentManagementTabs from "./components/StudentManagementTabs";
 import { Header } from "./components/Header";
 
+import { useBeforeUnloadWarning } from "@/hooks/useBeforeUnloadWarning";
+import { useUnexportedChanges } from "@/hooks/useUnexportedChanges";
 import { normalizeKey } from "@/lib/format/normalizeKey";
 import { parseSpreadsheetFile } from "@/lib/spreadsheet/spreadsheet";
 import { formatUploadTimestamp } from "@/lib/storage/uploadMetadata";
-import { deriveIsUnexported, getMetadata } from "@/lib/storage/metadata";
 import { addStudents } from "./lib/storage/addStudents";
 import { hasStudents } from "./lib/storage/hasStudents";
 import { searchStudentsByName } from "./lib/storage/searchStudents";
@@ -34,10 +35,10 @@ export default function App() {
   // status do parse da planilha
   const [isParsing, setIsParsing] = useState(false);
 
-  const metadata = useLiveQuery(() => getMetadata(), []);
+  const { metadata, hasUnexportedChanges } = useUnexportedChanges();
   const persistedUploadAt = metadata?.uploadedAt ?? "";
   const persistedUploadFileName = metadata?.fileName ?? "";
-  const hasUnexportedChanges = deriveIsUnexported(metadata);
+  useBeforeUnloadWarning(hasUnexportedChanges);
 
   // verifica se tem dados no banco
   useEffect(() => {
